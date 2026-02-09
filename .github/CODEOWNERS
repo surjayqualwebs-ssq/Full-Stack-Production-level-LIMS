@@ -1,0 +1,29 @@
+# This file defines the code owners for the repository.
+# Code owners will be automatically requested for review when someone opens a pull request.
+
+# 1. Global Owners
+# These users own the entire repository
+*  @prashant-qualwebs @surjayqualwebs-ssq         
+
+# 2. Backend Team (ownership of backend source code, migrations, and seeds)
+/backend/       # @backend-team @backend-lead
+/backend/src/migrations/ # @db-admin
+/backend/src/models/     # @db-admin
+
+# 3. Frontend Team (ownership of frontend source code and public assets)
+/frontend/      # @frontend-team @frontend-lead
+/frontend/src/styles/  # @design-team
+
+# 4. DevOps (ownership of Docker, CI/CD workflows, and root config files)
+Dockerfile      # @devops-lead
+docker-compose* # @devops-lead
+.github/        # @devops-lead
+package.json    # @tech-lead
+
+# 5. Documentation
+*.md            # @tech-writer
+
+# Example Usernames (Replace with actual GitHub usernames):
+# @backend-lead = @johndoe
+# @frontend-lead = @janedoe
+# @devops-lead = @admin

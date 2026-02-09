@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production
+
+COPY . .
+
+# Expose the port (must match the one used in app)
+EXPOSE 3168
+
+# Run the application directly
+CMD ["node", "src/server.js"]
