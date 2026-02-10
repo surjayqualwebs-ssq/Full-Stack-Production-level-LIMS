@@ -85,7 +85,7 @@ const ReviewIntake = () => {
                     <div className="flex gap-4 text-sm text-gray-600">
                         <span><strong>Client:</strong> {intake.client?.name}</span>
                         <span><strong>Submitted:</strong> {new Date(intake.createdAt).toLocaleString()}</span>
-                        <span><strong>Attempt:</strong> {intake.submission_attempt}/3</span>
+                        <span><strong>Attempt:</strong> {intake.attempts}/3</span>
                     </div>
                 </div>
                 <div className="text-right">
@@ -118,11 +118,11 @@ const ReviewIntake = () => {
 
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                         <h2 className="text-lg font-semibold mb-4 border-b pb-2">Documents</h2>
-                        {!intake.details?.documents || intake.details.documents.length === 0 ? (
+                        {!intake.documents || intake.documents.length === 0 ? (
                             <p className="text-gray-500 italic">No documents attached.</p>
                         ) : (
                             <ul className="space-y-3">
-                                {intake.details.documents.map((doc, idx) => (
+                                {intake.documents.map((doc, idx) => (
                                     <li key={idx} className="flex items-center justify-between bg-gray-50 p-3 rounded border border-gray-200">
                                         <div className="flex items-center gap-3">
                                             <FileText size={20} className="text-blue-500" />
