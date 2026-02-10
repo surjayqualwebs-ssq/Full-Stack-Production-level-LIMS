@@ -69,6 +69,25 @@ const ReviewIntake = () => {
         }
     };
 
+    const handleViewDocument = async (docUrl, filename) => {
+        try {
+            // Strip '/api' prefix as axios instance adds it
+            const url = docUrl.startsWith('/api') ? docUrl.substring(4) : docUrl;
+
+            const response = await api.get(url, { responseType: 'blob' });
+
+            // Create Blob URL
+            const blob = new Blob([response.data], { type: response.headers['content-type'] });
+            const blobUrl = window.URL.createObjectURL(blob);
+
+            // Open in new tab
+            window.open(blobUrl, '_blank');
+        } catch (error) {
+            console.error("Failed to download document", error);
+            alert("Failed to view document. Please try again.");
+        }
+    };
+
     if (loading) return <div className="p-8">Loading...</div>;
     if (!intake) return <div className="p-8">Intake not found.</div>;
 
@@ -128,9 +147,12 @@ const ReviewIntake = () => {
                                             <FileText size={20} className="text-blue-500" />
                                             <span className="font-medium text-gray-700">{doc.name}</span>
                                         </div>
-                                        <a href={doc.url} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm">
+                                        <button
+                                            onClick={() => handleViewDocument(doc.url, doc.name)}
+                                            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm hover:underline"
+                                        >
                                             View <ExternalLink size={14} />
-                                        </a>
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
