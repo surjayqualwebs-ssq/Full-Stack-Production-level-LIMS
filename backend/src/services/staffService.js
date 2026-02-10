@@ -22,7 +22,11 @@ export const updateProfile = async (userId, data) => {
 export const getPendingIntakes = async (staffId) => {
     const whereClause = { status: 'PENDING' };
     if (staffId) {
-        whereClause.assigned_staff_id = staffId;
+        // Show intakes assigned to this staff OR unassigned intakes (pool)
+        whereClause[db.Sequelize.Op.or] = [
+            { assigned_staff_id: staffId },
+            { assigned_staff_id: null }
+        ];
     }
 
     const intakes = await db.Intake.findAll({
