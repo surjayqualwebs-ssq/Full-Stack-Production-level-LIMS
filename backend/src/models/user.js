@@ -9,6 +9,7 @@ export default (sequelize, DataTypes) => {
             User.hasOne(models.LawyerProfile, { foreignKey: 'userId', as: 'lawyerProfile', onDelete: 'CASCADE' });
             User.hasOne(models.StaffProfile, { foreignKey: 'userId', as: 'staffProfile', onDelete: 'CASCADE' });
             User.hasOne(models.AdminProfile, { foreignKey: 'userId', as: 'adminProfile', onDelete: 'CASCADE' });
+            User.hasMany(models.Task, { foreignKey: 'assigned_to', as: 'tasks' });
         }
     }
 

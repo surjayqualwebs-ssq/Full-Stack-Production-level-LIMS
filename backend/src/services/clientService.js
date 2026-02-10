@@ -2,6 +2,7 @@ import db from '../models/index.js';
 
 const { Intake, Case, LawyerProfile, User } = db;
 
+import { linkDocumentsToIntake } from './documentService.js';
 import { randomUUID } from 'crypto';
 
 const processDocuments = (newDocs, existingDocs = []) => {
@@ -71,14 +72,33 @@ export const createIntake = async (userId, data) => {
         assignedStaffId = staffLoads[0].id;
     }
 
-    return await Intake.create({
+    const intake = await Intake.create({
         client_id: userId,
         assigned_staff_id: assignedStaffId,
         case_type: data.caseType,
         details: JSON.stringify(data.details),
-        documents: versionedDocs,
         status: 'PENDING'
     });
+
+    // Link uploaded documents to this intake
+    let finalDocs = [];
+    if (data.documents && Array.isArray(data.documents)) {
+        const docIds = data.documents.map(d => d.id).filter(id => id);
+        await linkDocumentsToIntake(docIds, intake.id);
+
+        // Transform for JSON storage compatibility (ReviewIntake expects 'url')
+        finalDocs = data.documents.map(d => ({
+            ...d,
+            url: d.url || `/api/documents/${d.id}/download`, // Use existing URL or generate API link
+            uploaded_at: new Date().toISOString()
+        }));
+
+        // Update the JSON column with the enhanced data
+        intake.documents = finalDocs;
+        await intake.save();
+    }
+
+    return intake;
 };
 
 export const getMyIntakes = async (userId) => {
@@ -117,8 +137,17 @@ export const updateIntake = async (userId, intakeId, data) => {
         if (data.details) intake.details = JSON.stringify(data.details);
 
         // Handle document updates
+        // Handle document updates
         if (data.documents && Array.isArray(data.documents)) {
-            intake.documents = processDocuments(data.documents, intake.documents);
+            const docIds = data.documents.map(d => d.id).filter(id => id);
+            await linkDocumentsToIntake(docIds, intake.id);
+
+            // Transform for JSON storage compatibility
+            intake.documents = data.documents.map(d => ({
+                ...d,
+                url: d.url || `/api/documents/${d.id}/download`,
+                uploaded_at: new Date().toISOString()
+            }));
         }
 
         intake.attempts += 1;

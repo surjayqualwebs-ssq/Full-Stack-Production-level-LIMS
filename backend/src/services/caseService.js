@@ -169,3 +169,71 @@ export const getAllCases = async () => {
         ]
     });
 };
+
+export const getUpcomingHearings = async (userId, role, days = 7) => {
+    const today = new Date();
+    const targetDate = new Date();
+    targetDate.setDate(today.getDate() + days);
+
+    const whereClause = {
+        next_hearing_date: {
+            [Op.between]: [today, targetDate]
+        }
+    };
+
+    if (role === 'LAWYER') {
+        whereClause.lawyer_id = userId;
+    } else if (role === 'CLIENT') {
+        whereClause.client_id = userId;
+    }
+
+    return await Case.findAll({
+        where: whereClause,
+        order: [['next_hearing_date', 'ASC']],
+        include: [
+            {
+                model: db.User,
+                as: 'client',
+                attributes: ['email'],
+                include: [{ model: db.ClientProfile, as: 'clientProfile', attributes: ['name'] }]
+            },
+            {
+                model: db.User,
+                as: 'lawyer',
+                attributes: ['email'],
+                include: [{ model: db.LawyerProfile, as: 'lawyerProfile', attributes: ['name'] }]
+            }
+        ]
+    });
+};
+
+export const updateCaseStatus = async (caseId, newStatus, userId, userRole) => {
+    const caseRecord = await Case.findByPk(caseId);
+    if (!caseRecord) throw new Error('Case not found');
+
+    if (userRole === 'LAWYER' && caseRecord.lawyer_id !== userId) {
+        throw new Error('Unauthorized: You are not the assigned lawyer');
+    }
+    if (userRole === 'CLIENT') {
+        throw new Error('Unauthorized: Clients cannot change case status');
+    }
+
+    const validTransitions = {
+        'QUEUED': ['OPEN', 'CLOSED'],
+        'OPEN': ['IN_PROGRESS', 'ON_HOLD', 'CLOSED'],
+        'IN_PROGRESS': ['ON_HOLD', 'CLOSED', 'OPEN'],
+        'ON_HOLD': ['IN_PROGRESS', 'CLOSED', 'OPEN'],
+        'CLOSED': ['OPEN']
+    };
+
+    const currentStatus = caseRecord.status;
+    if (currentStatus !== newStatus) {
+        const allowed = validTransitions[currentStatus] || [];
+        if (!allowed.includes(newStatus) && userRole !== 'ADMIN') {
+            throw new Error(`Invalid status transition from ${currentStatus} to ${newStatus}`);
+        }
+    }
+
+    caseRecord.status = newStatus;
+    return await caseRecord.save();
+};

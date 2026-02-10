@@ -26,6 +26,11 @@ const buildApp = async (opts = {}) => {
     });
 
     // Plugins
+    await app.register(import('@fastify/multipart'), {
+        limits: {
+            fileSize: 10 * 1024 * 1024 // 10MB limit
+        }
+    });
     await app.register(import('./plugins/db.js'));
     await app.register(import('./plugins/auth.js'));
 
@@ -37,6 +42,7 @@ const buildApp = async (opts = {}) => {
     await app.register(import('./routes/lawyerRoutes.js'), { prefix: '/api/lawyer' });
     await app.register(import('./routes/staffRoutes.js'), { prefix: '/api/staff' });
     await app.register(import('./routes/auditRoutes.js'), { prefix: '/api/audit' });
+    await app.register(import('./routes/uploadRoutes.js'), { prefix: '/api/documents' });
 
 
     // Global Error Handler

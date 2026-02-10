@@ -15,15 +15,35 @@ const NewIntake = () => {
 
     // Document State
     const [docName, setDocName] = useState('');
-    const [docUrl, setDocUrl] = useState('');
-    const [documents, setDocuments] = useState([]);
+    const [documents, setDocuments] = useState([]); // Array of { id, name }
 
-    const handleAddDocument = (e) => {
-        e.preventDefault();
-        if (docName && docUrl) {
-            setDocuments([...documents, { name: docName, url: docUrl }]);
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!docName) {
+            setError('Please enter a document name first.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('name', docName);
+        formData.append('entity_type', 'INTAKE'); // Initially unlinked, but we can tag it
+
+        setLoading(true);
+        try {
+            const response = await api.post('/documents/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            const newDoc = response.data;
+            setDocuments([...documents, { id: newDoc.id, name: docName }]);
             setDocName('');
-            setDocUrl('');
+            setLoading(false);
+            e.target.value = null; // Reset input
+        } catch (err) {
+            console.error('Upload failed', err);
+            setError('Failed to upload document');
+            setLoading(false);
         }
     };
 
@@ -153,34 +173,31 @@ const NewIntake = () => {
                                 <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                                     <p className="text-sm text-gray-600 mb-4">Attach any relevant documents (e.g., police reports, contracts, images).</p>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-                                        <div className="md:col-span-2">
+                                    <div className="flex flex-col md:flex-row gap-4 mb-4">
+                                        <div className="flex-1">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Document Name</label>
                                             <input
                                                 type="text"
-                                                placeholder="Document Name"
+                                                placeholder="e.g., Police Report"
                                                 value={docName}
                                                 onChange={(e) => setDocName(e.target.value)}
                                                 className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                             />
                                         </div>
-                                        <div className="md:col-span-2">
+                                        <div className="flex-1">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">File Upload</label>
                                             <input
-                                                type="url"
-                                                placeholder="Document URL"
-                                                value={docUrl}
-                                                onChange={(e) => setDocUrl(e.target.value)}
-                                                className="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                                type="file"
+                                                onChange={handleFileUpload}
+                                                disabled={!docName}
+                                                className="w-full text-sm text-gray-500
+                                                    file:mr-4 file:py-2.5 file:px-4
+                                                    file:rounded-lg file:border-0
+                                                    file:text-sm file:font-semibold
+                                                    file:bg-blue-50 file:text-blue-700
+                                                    hover:file:bg-blue-100 placeholder:block"
                                             />
-                                        </div>
-                                        <div>
-                                            <button
-                                                onClick={handleAddDocument}
-                                                type="button"
-                                                disabled={!docName || !docUrl}
-                                                className="w-full bg-blue-600 text-white rounded-lg p-2.5 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                            >
-                                                Add
-                                            </button>
+                                            {!docName && <p className="text-xs text-red-500 mt-1">Please enter a name first.</p>}
                                         </div>
                                     </div>
 
@@ -192,7 +209,7 @@ const NewIntake = () => {
                                                         <File className="text-blue-500 shrink-0" size={18} />
                                                         <div className="truncate">
                                                             <p className="font-medium text-gray-800 text-sm">{doc.name}</p>
-                                                            <p className="text-gray-400 text-xs truncate">{doc.url}</p>
+                                                            <p className="text-gray-400 text-xs truncate">ID: {doc.id} - Uploaded</p>
                                                         </div>
                                                     </div>
                                                     <button

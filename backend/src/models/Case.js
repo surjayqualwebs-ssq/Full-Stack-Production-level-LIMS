@@ -6,6 +6,14 @@ export default (sequelize, DataTypes) => {
             Case.belongsTo(models.Intake, { foreignKey: 'intake_id', as: 'intake' });
             Case.belongsTo(models.User, { foreignKey: 'client_id', as: 'client' });
             Case.belongsTo(models.User, { foreignKey: 'lawyer_id', as: 'lawyer' });
+
+            Case.hasMany(models.Task, { foreignKey: 'related_case_id', as: 'tasks' });
+            Case.hasMany(models.Document, {
+                foreignKey: 'entity_id',
+                constraints: false,
+                scope: { entity_type: 'CASE' },
+                as: 'documents'
+            });
             // Case.hasMany(models.CaseUpdate, ...); // Future
         }
     }

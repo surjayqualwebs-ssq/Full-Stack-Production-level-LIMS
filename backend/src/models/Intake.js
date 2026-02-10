@@ -4,7 +4,12 @@ export default (sequelize, DataTypes) => {
     class Intake extends Model {
         static associate(models) {
             Intake.belongsTo(models.User, { foreignKey: 'client_id', as: 'client' });
-            // Will associate with Case later
+            Intake.hasMany(models.Document, {
+                foreignKey: 'entity_id',
+                constraints: false,
+                scope: { entity_type: 'INTAKE' },
+                as: 'files'
+            });
         }
     }
 
