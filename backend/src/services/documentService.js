@@ -94,7 +94,12 @@ export const getDocumentFile = async (versionId) => {
     if (!version) throw new Error('Version not found');
 
     const filePath = path.join(uploadDir, version.file_path);
-    if (!fs.existsSync(filePath)) throw new Error('File not found on disk');
+    console.log(`[DEBUG] Resolved file path: ${filePath}`);
+
+    if (!fs.existsSync(filePath)) {
+        console.error(`[ERROR] File missing at path: ${filePath}`);
+        throw new Error(`File not found on disk at ${filePath}`);
+    }
 
     return { stream: fs.createReadStream(filePath), mimetype: version.mime_type, filename: version.original_name };
 };

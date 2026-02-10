@@ -57,10 +57,13 @@ const uploadRoutes = async (fastify, options) => {
 
         // Find latest version for this document
         // We could move this logic to service "getLatestDocumentFile(docId)"
+        console.log(`[DEBUG] Downloading document ${id}`);
         const latestVersion = await db.DocumentVersion.findOne({
             where: { document_id: id },
             order: [['version_number', 'DESC']]
         });
+
+        console.log(`[DEBUG] Latest version for ${id}:`, latestVersion ? latestVersion.id : 'None');
 
         if (!latestVersion) {
             return reply.status(404).send({ message: 'Document not found' });
