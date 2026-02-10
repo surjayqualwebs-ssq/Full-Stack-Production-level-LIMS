@@ -24,6 +24,16 @@ export const updateProfile = async (req, reply) => {
 
     await profile.save();
 
+    // Audit
+    await auditService.logAction({
+        userId,
+        action: 'UPDATE_PROFILE',
+        entityType: 'USER',
+        entityId: userId,
+        details: { updates: { dob, gender } },
+        ipAddress: req.ip
+    });
+
     return reply.send({
         message: 'Profile updated successfully',
         profile

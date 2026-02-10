@@ -12,6 +12,17 @@ export const getProfile = async (req, reply) => {
 export const updateProfile = async (req, reply) => {
     const userId = req.user.id;
     const profile = await staffService.updateProfile(userId, req.body);
+
+    // Audit
+    await auditService.logAction({
+        userId,
+        action: 'UPDATE_PROFILE',
+        entityType: 'USER',
+        entityId: userId,
+        details: { updates: req.body }, // Be careful not to log sensitive info if any
+        ipAddress: req.ip
+    });
+
     return reply.send({ message: 'Profile updated', profile });
 };
 

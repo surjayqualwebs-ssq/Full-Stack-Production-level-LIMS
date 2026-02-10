@@ -12,7 +12,7 @@ const AdminDashboard = () => {
 
     // New User Form State
     const [showUserForm, setShowUserForm] = useState(false);
-    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'STAFF', case_types: [] });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'STAFF', case_types: [], experience_years: '', rating: '', consultation_fee: '' });
 
     // Logs State
     const [logs, setLogs] = useState([]);
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
         try {
             await api.post('/admin/users', newUser);
             setFormSuccess('User created successfully!');
-            setNewUser({ name: '', email: '', password: '', role: 'STAFF', case_types: [] });
+            setNewUser({ name: '', email: '', password: '', role: 'STAFF', case_types: [], experience_years: '', rating: '', consultation_fee: '' });
             fetchData(); // Refresh list
             setTimeout(() => setShowUserForm(false), 2000);
         } catch (error) {
@@ -224,27 +224,61 @@ const AdminDashboard = () => {
                                 </div>
 
                                 {newUser.role === 'LAWYER' && (
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Specialization (Case Types)</label>
-                                        <div className="flex gap-4">
-                                            {['CIVIL', 'CRIMINAL', 'CORPORATE', 'MATRIMONIAL'].map(type => (
-                                                <label key={type} className="flex items-center gap-2 cursor-pointer">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={newUser.case_types?.includes(type)}
-                                                        onChange={e => {
-                                                            const types = e.target.checked
-                                                                ? [...(newUser.case_types || []), type]
-                                                                : newUser.case_types.filter(t => t !== type);
-                                                            setNewUser({ ...newUser, case_types: types });
-                                                        }}
-                                                        className="rounded text-blue-600 focus:ring-blue-500"
-                                                    />
-                                                    <span className="text-sm text-gray-700 capitalize">{type.toLowerCase()}</span>
-                                                </label>
-                                            ))}
+                                    <>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Specialization (Case Types)</label>
+                                            <div className="flex gap-4 flex-wrap">
+                                                {['CIVIL', 'CRIMINAL', 'CORPORATE', 'MATRIMONIAL'].map(type => (
+                                                    <label key={type} className="flex items-center gap-2 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={newUser.case_types?.includes(type)}
+                                                            onChange={e => {
+                                                                const types = e.target.checked
+                                                                    ? [...(newUser.case_types || []), type]
+                                                                    : newUser.case_types.filter(t => t !== type);
+                                                                setNewUser({ ...newUser, case_types: types });
+                                                            }}
+                                                            className="rounded text-blue-600 focus:ring-blue-500"
+                                                        />
+                                                        <span className="text-sm text-gray-700 capitalize">{type.toLowerCase()}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Experience (Years)</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={newUser.experience_years}
+                                                onChange={e => setNewUser({ ...newUser, experience_years: e.target.value })}
+                                                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Rating (0-5)</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="5"
+                                                step="0.1"
+                                                value={newUser.rating}
+                                                onChange={e => setNewUser({ ...newUser, rating: e.target.value })}
+                                                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Consultation Fee (₹)</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={newUser.consultation_fee}
+                                                onChange={e => setNewUser({ ...newUser, consultation_fee: e.target.value })}
+                                                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            />
+                                        </div>
+                                    </>
                                 )}
 
                                 <div className="md:col-span-2 pt-2">
@@ -320,6 +354,43 @@ const AdminDashboard = () => {
                                             <option value="BANNED">Banned</option>
                                         </select>
                                     </div>
+
+                                    {editingUser.role === 'LAWYER' && (
+                                        <>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Experience (Years)</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    value={editingUser.experience_years || (editingUser.lawyerProfile?.experience_years || '')}
+                                                    onChange={(e) => setEditingUser({ ...editingUser, experience_years: e.target.value })}
+                                                    className="w-full border p-2 rounded"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Rating (0-5)</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="5"
+                                                    step="0.1"
+                                                    value={editingUser.rating || (editingUser.lawyerProfile?.rating || '')}
+                                                    onChange={(e) => setEditingUser({ ...editingUser, rating: e.target.value })}
+                                                    className="w-full border p-2 rounded"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Consultation Fee</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    value={editingUser.consultation_fee || (editingUser.lawyerProfile?.consultation_fee || '')}
+                                                    onChange={(e) => setEditingUser({ ...editingUser, consultation_fee: e.target.value })}
+                                                    className="w-full border p-2 rounded"
+                                                />
+                                            </div>
+                                        </>
+                                    )}
                                     <div className="flex justify-end gap-2">
                                         <button
                                             type="button"

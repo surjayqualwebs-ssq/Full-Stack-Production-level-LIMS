@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { User, Mail, Calendar, Users, Save, Shield } from 'lucide-react';
 
 const ClientProfile = () => {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -37,8 +39,8 @@ const ClientProfile = () => {
 
         try {
             await api.patch('/client/me', { dob, gender });
-            setMessage({ type: 'success', text: 'Profile updated successfully!' });
-            fetchProfile(); // Refresh data
+            setMessage({ type: 'success', text: 'Profile updated successfully! Redirecting...' });
+            setTimeout(() => navigate('/client/dashboard'), 1500);
         } catch (error) {
             console.error("Failed to update profile", error);
             setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update profile.' });

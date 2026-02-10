@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
-import { User, Mail, Calendar, Users, Save, Shield, Briefcase } from 'lucide-react';
+import { User, Mail, Calendar, Users, Save, Shield, Briefcase, Award, DollarSign } from 'lucide-react';
 
-const StaffProfile = () => {
+const LawyerProfile = () => {
     const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -14,7 +14,8 @@ const StaffProfile = () => {
     const [name, setName] = useState('');
     const [dob, setDob] = useState('');
     const [gender, setGender] = useState('');
-    const [department, setDepartment] = useState('');
+    const [experience, setExperience] = useState('');
+    const [consultationFee, setConsultationFee] = useState('');
 
     useEffect(() => {
         fetchProfile();
@@ -22,12 +23,13 @@ const StaffProfile = () => {
 
     const fetchProfile = async () => {
         try {
-            const response = await api.get('/staff/me');
+            const response = await api.get('/lawyer/me');
             setProfile(response.data);
             setName(response.data.name || '');
             setDob(response.data.dob || '');
             setGender(response.data.gender || '');
-            setDepartment(response.data.department || '');
+            setExperience(response.data.experience_years || '');
+            setConsultationFee(response.data.consultation_fee || '');
         } catch (error) {
             console.error("Failed to fetch profile", error);
             setMessage({ type: 'error', text: 'Failed to load profile data.' });
@@ -42,9 +44,15 @@ const StaffProfile = () => {
         setMessage({ type: '', text: '' });
 
         try {
-            await api.patch('/staff/me', { name, dob, gender, department });
+            await api.patch('/lawyer/me', {
+                name,
+                dob,
+                gender,
+                experience_years: experience,
+                consultation_fee: consultationFee
+            });
             setMessage({ type: 'success', text: 'Profile updated successfully! Redirecting...' });
-            setTimeout(() => navigate('/staff/dashboard'), 1500);
+            setTimeout(() => navigate('/lawyer/dashboard'), 1500);
         } catch (error) {
             console.error("Failed to update profile", error);
             setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update profile.' });
@@ -60,7 +68,7 @@ const StaffProfile = () => {
     );
 
     return (
-        <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
+        <div className="max-w-3xl mx-auto animate-in fade-in duration-500">
             <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <User className="text-blue-600" /> My Profile
             </h1>
@@ -82,7 +90,7 @@ const StaffProfile = () => {
                             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Role</label>
                             <div className="flex items-center gap-3 text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100">
                                 <Shield size={18} className="text-gray-400" />
-                                <span className="font-medium capitalize">{profile?.user?.role?.toLowerCase() || 'Staff'}</span>
+                                <span className="font-medium capitalize">{profile?.user?.role?.toLowerCase() || 'Lawyer'}</span>
                             </div>
                         </div>
                     </div>
@@ -146,24 +154,41 @@ const StaffProfile = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label htmlFor="department" className="block text-sm font-medium text-gray-700">Department</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Briefcase size={18} className="text-gray-400" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label htmlFor="experience" className="block text-sm font-medium text-gray-700">Experience (Years)</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Award size={18} className="text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        id="experience"
+                                        min="0"
+                                        value={experience}
+                                        onChange={(e) => setExperience(e.target.value)}
+                                        className="pl-10 w-full rounded-lg border-gray-300 border focus:ring-blue-500 focus:border-blue-500 py-2.5 transition-colors"
+                                        placeholder="e.g. 5"
+                                    />
                                 </div>
-                                <select
-                                    id="department"
-                                    value={department}
-                                    onChange={(e) => setDepartment(e.target.value)}
-                                    className="pl-10 w-full rounded-lg border-gray-300 border focus:ring-blue-500 focus:border-blue-500 py-2.5 transition-colors appearance-none bg-white"
-                                >
-                                    <option value="">Select Department</option>
-                                    <option value="LEGAL">Legal</option>
-                                    <option value="HR">HR</option>
-                                    <option value="IT">IT</option>
-                                    <option value="ADMIN">Admin</option>
-                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="consultationFee" className="block text-sm font-medium text-gray-700">Consultation Fee (₹)</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <DollarSign size={18} className="text-gray-400" />
+                                    </div>
+                                    <input
+                                        type="number"
+                                        id="consultationFee"
+                                        min="0"
+                                        value={consultationFee}
+                                        onChange={(e) => setConsultationFee(e.target.value)}
+                                        className="pl-10 w-full rounded-lg border-gray-300 border focus:ring-blue-500 focus:border-blue-500 py-2.5 transition-colors"
+                                        placeholder="e.g. 1000"
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -199,4 +224,4 @@ const StaffProfile = () => {
     );
 };
 
-export default StaffProfile;
+export default LawyerProfile;

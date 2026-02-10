@@ -35,6 +35,8 @@ services:
         awslogs-create-group: "true"
     depends_on:
       - postgres
+    volumes:
+      - lims_uploads:/app/uploads
 
   frontend:
     image: ${DOCKER_USERNAME}/lims-frontend:latest
@@ -47,3 +49,4 @@ services:
 
 volumes:
   postgres_data:
+  lims_uploads:

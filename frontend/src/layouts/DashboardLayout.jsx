@@ -183,6 +183,7 @@ const DashboardLayout = ({ allowedRoles }) => {
                                                 // Navigate based on role
                                                 if (user.role === 'CLIENT') navigate('/client/profile');
                                                 if (user.role === 'STAFF') navigate('/staff/profile');
+                                                if (user.role === 'LAWYER') navigate('/lawyer/profile');
                                                 // Add other roles if they get profile pages later
                                             }}
                                             className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
