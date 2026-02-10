@@ -64,7 +64,7 @@ export const createInternalUser = async (data) => {
 
 export const getAllUsers = async () => {
     // Admin can view all users and their profiles
-    return await User.findAll({
+    const users = await User.findAll({
         attributes: ['id', 'email', 'role', 'status', 'created_at'],
         include: [
             { model: ClientProfile, as: 'clientProfile', attributes: ['name'] },
@@ -72,6 +72,17 @@ export const getAllUsers = async () => {
             { model: StaffProfile, as: 'staffProfile', attributes: ['name'] },
             { model: AdminProfile, as: 'adminProfile', attributes: ['name'] }
         ]
+    });
+
+    return users.map(user => {
+        const u = user.toJSON();
+        let name = 'Unknown';
+        if (u.role === 'CLIENT' && u.clientProfile) name = u.clientProfile.name;
+        else if (u.role === 'LAWYER' && u.lawyerProfile) name = u.lawyerProfile.name;
+        else if (u.role === 'STAFF' && u.staffProfile) name = u.staffProfile.name;
+        else if (u.role === 'ADMIN' && u.adminProfile) name = u.adminProfile.name;
+
+        return { ...u, name };
     });
 };
 

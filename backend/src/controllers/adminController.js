@@ -1,5 +1,6 @@
 import * as adminService from '../services/adminService.js';
 import * as caseService from '../services/caseService.js';
+import * as auditService from '../services/auditService.js';
 import { NotFoundError, ApiError, ConflictError } from '../errors/index.js';
 
 export const getProfile = async (req, reply) => {
@@ -12,6 +13,17 @@ export const getProfile = async (req, reply) => {
 export const updateProfile = async (req, reply) => {
     const userId = req.user.id;
     const profile = await adminService.updateProfile(userId, req.body);
+
+    // Audit
+    await auditService.logAction({
+        userId,
+        action: 'UPDATE_PROFILE',
+        entityType: 'USER',
+        entityId: userId,
+        details: { updates: req.body },
+        ipAddress: req.ip
+    });
+
     return reply.send({ message: 'Profile updated', profile });
 };
 
@@ -29,6 +41,17 @@ export const createInternalUser = async (req, reply) => {
 
     try {
         const newUser = await adminService.createInternalUser(req.body);
+
+        // Audit
+        await auditService.logAction({
+            userId: req.user.id,
+            action: 'CREATE_USER',
+            entityType: 'USER',
+            entityId: newUser.id,
+            details: { name, role, email },
+            ipAddress: req.ip
+        });
+
         return reply.code(201).send({ message: 'User created successfully', userId: newUser.id });
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
@@ -40,11 +63,29 @@ export const createInternalUser = async (req, reply) => {
 
 export const getAllUsers = async (req, reply) => {
     const users = await adminService.getAllUsers();
+
+    // Audit (Optional but requested: logging all activities)
+    await auditService.logAction({
+        userId: req.user.id,
+        action: 'VIEW_ALL_USERS',
+        entityType: 'SYSTEM',
+        ipAddress: req.ip
+    });
+
     return reply.send(users);
 };
 
 export const getAllCases = async (req, reply) => {
     const cases = await caseService.getAllCases();
+
+    // Audit
+    await auditService.logAction({
+        userId: req.user.id,
+        action: 'VIEW_ALL_CASES',
+        entityType: 'SYSTEM',
+        ipAddress: req.ip
+    });
+
     return reply.send(cases);
 };
 
@@ -52,5 +93,16 @@ export const updateUserProfile = async (req, reply) => {
     const { id } = req.params;
     const data = req.body;
     await adminService.updateAnyUserProfile(id, data);
+
+    // Audit
+    await auditService.logAction({
+        userId: req.user.id,
+        action: 'UPDATE_USER',
+        entityType: 'USER',
+        entityId: id,
+        details: { updates: data },
+        ipAddress: req.ip
+    });
+
     return reply.send({ message: 'User profile updated successfully' });
 };
