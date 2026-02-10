@@ -3,7 +3,7 @@ import { Route, Navigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import LawyerDashboard from '../pages/lawyer/Dashboard';
 import LawyerCaseDetails from '../pages/lawyer/LawyerCaseDetails';
-import LawyerCaseDetails from '../pages/lawyer/LawyerCaseDetails';
+
 import LawyerProfile from '../pages/lawyer/LawyerProfile';
 import ActivityLogs from '../pages/common/ActivityLogs';
 
