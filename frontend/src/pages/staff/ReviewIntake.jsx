@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
-import { CheckCircle, XCircle, AlertTriangle, FileText, ArrowLeft, ExternalLink } from 'lucide-react';
+import { CheckCircle, FileText, ArrowLeft, ExternalLink, XCircle } from 'lucide-react';
 
 const ReviewIntake = () => {
     const { id } = useParams();
@@ -69,7 +69,19 @@ const ReviewIntake = () => {
         }
     };
 
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [previewName, setPreviewName] = useState('');
+    const [previewLoading, setPreviewLoading] = useState(false);
+
     const handleViewDocument = async (docUrl, filename) => {
+        if (!docUrl) {
+            alert("Error: Document URL is missing.");
+            return;
+        }
+
+        setPreviewLoading(true);
+        setPreviewName(filename);
+
         try {
             // Strip '/api' prefix as axios instance adds it
             const url = docUrl.startsWith('/api') ? docUrl.substring(4) : docUrl;
@@ -80,12 +92,24 @@ const ReviewIntake = () => {
             const blob = new Blob([response.data], { type: response.headers['content-type'] });
             const blobUrl = window.URL.createObjectURL(blob);
 
-            // Open in new tab
-            window.open(blobUrl, '_blank');
+            setPreviewUrl(blobUrl);
         } catch (error) {
             console.error("Failed to download document", error);
-            alert("Failed to view document. Please try again.");
+            const status = error.response?.status;
+            const msg = error.response?.data?.message || error.message;
+            alert(`Failed to view document: ${status || ''} ${msg}`);
+            setPreviewUrl(null);
+        } finally {
+            setPreviewLoading(false);
         }
+    };
+
+    const closePreview = () => {
+        if (previewUrl) {
+            window.URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
+        }
+        setPreviewLoading(false);
     };
 
     if (loading) return <div className="p-8">Loading...</div>;
@@ -252,6 +276,42 @@ const ReviewIntake = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Document Preview Modal */}
+            {(previewUrl || previewLoading) && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden">
+                        <div className="flex justify-between items-center p-4 border-b bg-gray-50">
+                            <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                                <FileText size={18} className="text-blue-600" />
+                                {previewName}
+                            </h3>
+                            <button
+                                onClick={closePreview}
+                                className="text-gray-500 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors"
+                            >
+                                <XCircle size={24} />
+                            </button>
+                        </div>
+                        <div className="flex-1 bg-gray-100 p-1 relative">
+                            {previewLoading ? (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+                                        <p className="text-gray-500 font-medium">Loading document...</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <iframe
+                                    src={previewUrl}
+                                    className="w-full h-full rounded border bg-white"
+                                    title="Document Preview"
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
