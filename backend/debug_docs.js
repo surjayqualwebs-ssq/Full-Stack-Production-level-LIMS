@@ -12,17 +12,12 @@ const run = async () => {
 
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
-        // service is in src/services
-        // so __dirname (of service) is root/backend/src/services
-        // uploadDir is ../../uploads -> root/backend/uploads
-        // Here __dirname is root/backend
-        // so uploadDir is ./uploads
         const uploadDir = path.join(__dirname, 'uploads');
 
         console.log("Upload Dir:", uploadDir);
 
         const docs = await db.Document.findAll({ include: ['versions'] });
-        console.log(`Found ${docs.length} documents.`);
+        console.log(`Found ${docs.length} documents in DB.`);
 
         for (const doc of docs) {
             console.log(`\nDocument ID: ${doc.id} Name: ${doc.name}`);
@@ -32,16 +27,42 @@ const run = async () => {
                 console.log(`  File Path (DB): ${latest.file_path}`);
 
                 const fullPath = path.join(uploadDir, latest.file_path);
-                console.log(`  Full Path: ${fullPath}`);
 
                 if (fs.existsSync(fullPath)) {
                     console.log(`  [OK] File exists.`);
                 } else {
-                    console.error(`  [FAIL] File NOT found!`);
+                    console.error(`  [FAIL] File NOT found at ${fullPath}`);
                 }
             } else {
                 console.log("  No versions found.");
             }
+        }
+
+        console.log("\n--- Checking Intake 1 ---");
+        try {
+            const intake = await db.Intake.findByPk(1);
+            if (intake) {
+                console.log("Intake 1 found.");
+                // documents is JSONB, so it should be an object/array already
+                console.log("Documents JSON:", JSON.stringify(intake.documents, null, 2));
+
+                if (Array.isArray(intake.documents)) {
+                    for (const doc of intake.documents) {
+                        console.log(`Checking Doc ID: ${doc.id} (URL: ${doc.url})`);
+                        if (doc.id) {
+                            // Verify if this doc ID exists in DB
+                            const dbDoc = await db.Document.findByPk(doc.id);
+                            console.log(`  -> Exists in DB? ${!!dbDoc}`);
+                        } else {
+                            console.log("  -> No ID in JSON object");
+                        }
+                    }
+                }
+            } else {
+                console.log("Intake 1 NOT found.");
+            }
+        } catch (err) {
+            console.error("Error checking intake:", err);
         }
 
         await db.sequelize.close();

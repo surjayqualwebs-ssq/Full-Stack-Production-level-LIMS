@@ -95,8 +95,23 @@ const ReviewIntake = () => {
             setPreviewUrl(blobUrl);
         } catch (error) {
             console.error("Failed to download document", error);
-            const status = error.response?.status;
-            const msg = error.response?.data?.message || error.message;
+
+            let status = error.response?.status;
+            let msg = error.message;
+
+            // If response is a Blob (because responseType was 'blob'), read it
+            if (error.response?.data instanceof Blob) {
+                try {
+                    const text = await error.response.data.text();
+                    const json = JSON.parse(text);
+                    msg = json.message || msg;
+                } catch (e) {
+                    // Failed to parse, use default
+                }
+            } else if (error.response?.data?.message) {
+                msg = error.response.data.message;
+            }
+
             alert(`Failed to view document: ${status || ''} ${msg}`);
             setPreviewUrl(null);
         } finally {
