@@ -69,11 +69,24 @@ const uploadRoutes = async (fastify, options) => {
             return reply.status(404).send({ message: 'Document not found' });
         }
 
-        const fileData = await documentService.getDocumentFile(latestVersion.id);
+        try {
+            const fileData = await documentService.getDocumentFile(latestVersion.id);
+            console.log(`[DEBUG] File found: ${fileData.filename}, ${fileData.mimetype}`);
 
-        reply.header('Content-Disposition', `attachment; filename="${fileData.filename}"`);
-        reply.header('Content-Type', fileData.mimetype);
-        return reply.send(fileData.stream);
+            // Safety check for filename
+            const safeName = fileData.filename.replace(/"/g, '');
+
+            reply.header('Content-Disposition', `attachment; filename="${safeName}"`);
+            reply.type(fileData.mimetype);
+            return reply.send(fileData.stream);
+        } catch (error) {
+            console.error("[ERROR] Download route error:", error);
+            // Check for specific service errors
+            if (error.message.includes('not found')) {
+                return reply.status(404).send({ message: error.message });
+            }
+            return reply.status(500).send({ message: `Download failed: ${error.message}` });
+        }
     });
 };
 
