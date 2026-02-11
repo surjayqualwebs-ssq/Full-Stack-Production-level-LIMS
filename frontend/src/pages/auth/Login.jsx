@@ -17,6 +17,7 @@ const Login = () => {
         try {
             const result = await login(email, password);
             if (!result.success) {
+                // Display specific message from backend (e.g., "Access Denied..")
                 setError(result.message || 'Login failed');
             } else {
                 // AuthContext/AuthLayout will handle redirect based on role

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { Users, FileText, Activity, Shield, LogOut, Plus, Search, Edit } from 'lucide-react';
+import EditUserModal from '../../components/admin/EditUserModal';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({ users: 0, cases: 0 });
@@ -77,18 +78,7 @@ const AdminDashboard = () => {
         setShowEditModal(true);
     };
 
-    const saveUserEdit = async (e) => {
-        e.preventDefault();
-        try {
-            await api.put(`/admin/users/${editingUser.id}/profile`, editingUser);
-            setShowEditModal(false);
-            fetchData();
-            alert('User updated successfully'); // Simple feedback for now
-        } catch (error) {
-            console.error(error);
-            alert('Failed to update user');
-        }
-    };
+
 
     if (loading) return <div className="p-8 text-center text-gray-500">Loading admin dashboard...</div>;
 
@@ -329,86 +319,22 @@ const AdminDashboard = () => {
 
                     {/* Edit Modal */}
                     {showEditModal && editingUser && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-white p-6 rounded-lg w-full max-w-md">
-                                <h2 className="text-xl font-bold mb-4">Edit User: {editingUser.name}</h2>
-                                <form onSubmit={saveUserEdit} className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Name</label>
-                                        <input
-                                            type="text"
-                                            value={editingUser.name}
-                                            onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
-                                            className="w-full border p-2 rounded"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Status</label>
-                                        <select
-                                            value={editingUser.status}
-                                            onChange={(e) => setEditingUser({ ...editingUser, status: e.target.value })}
-                                            className="w-full border p-2 rounded"
-                                        >
-                                            <option value="ACTIVE">Active</option>
-                                            <option value="INACTIVE">Inactive</option>
-                                            <option value="BANNED">Banned</option>
-                                        </select>
-                                    </div>
-
-                                    {editingUser.role === 'LAWYER' && (
-                                        <>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Experience (Years)</label>
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    value={editingUser.experience_years || (editingUser.lawyerProfile?.experience_years || '')}
-                                                    onChange={(e) => setEditingUser({ ...editingUser, experience_years: e.target.value })}
-                                                    className="w-full border p-2 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Rating (0-5)</label>
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    max="5"
-                                                    step="0.1"
-                                                    value={editingUser.rating || (editingUser.lawyerProfile?.rating || '')}
-                                                    onChange={(e) => setEditingUser({ ...editingUser, rating: e.target.value })}
-                                                    className="w-full border p-2 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Consultation Fee</label>
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    value={editingUser.consultation_fee || (editingUser.lawyerProfile?.consultation_fee || '')}
-                                                    onChange={(e) => setEditingUser({ ...editingUser, consultation_fee: e.target.value })}
-                                                    className="w-full border p-2 rounded"
-                                                />
-                                            </div>
-                                        </>
-                                    )}
-                                    <div className="flex justify-end gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowEditModal(false)}
-                                            className="px-4 py-2 text-gray-600"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="px-4 py-2 bg-blue-600 text-white rounded"
-                                        >
-                                            Save Changes
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                        <EditUserModal
+                            user={editingUser}
+                            onClose={() => setShowEditModal(false)}
+                            onSave={async (updatedData) => {
+                                try {
+                                    await api.put(`/admin/users/${updatedData.id}/profile`, updatedData);
+                                    setShowEditModal(false);
+                                    fetchData();
+                                    alert('User updated successfully');
+                                } catch (error) {
+                                    console.error(error);
+                                    alert('Failed to update user');
+                                    throw error; // Re-throw to handle loading state in modal if needed
+                                }
+                            }}
+                        />
                     )}
                 </div>
             )}

@@ -66,9 +66,11 @@ export const login = async (req, reply) => {
 
         return reply.send({ token, user });
     } catch (error) {
-        if (error.message === 'Invalid email or password' || error.message === 'User is not active') {
-            // Optional: Log failed login attempt here if we had the user ID or just logging IP
-            throw new AuthorizationError('Invalid credentials');
+        if (error.message === 'Invalid email or password' ||
+            error.message.startsWith('Access Denied') ||
+            error.message.startsWith('Your account is inactive')) {
+            // Pass the specific error message to the frontend
+            throw new AuthorizationError(error.message);
         }
         throw error;
     }

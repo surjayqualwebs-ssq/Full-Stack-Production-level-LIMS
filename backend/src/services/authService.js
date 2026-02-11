@@ -67,8 +67,12 @@ export const login = async (email, password) => {
         throw new Error('Invalid email or password');
     }
 
+    if (user.status === 'BANNED') {
+        throw new Error('Access Denied: You have been banned from using this platform.');
+    }
+
     if (user.status !== 'ACTIVE') {
-        throw new Error('User is not active');
+        throw new Error('Your account is inactive. Please contact support.');
     }
 
     const isValid = await bcrypt.compare(password, user.password_hash);
