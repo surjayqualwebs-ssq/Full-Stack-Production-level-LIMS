@@ -330,7 +330,6 @@ const AdminDashboard = () => {
 
                     {/* Edit Modal */}
                     {showEditModal && editingUser && (
-<<<<<<< HEAD
                         <EditUserModal
                             user={editingUser}
                             onClose={() => setShowEditModal(false)}
@@ -347,98 +346,6 @@ const AdminDashboard = () => {
                                 }
                             }}
                         />
-=======
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-white p-6 rounded-lg w-full max-w-md">
-                                <h2 className="text-xl font-bold mb-4">Edit User: {editingUser.name}</h2>
-                                <form onSubmit={saveUserEdit} className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Name</label>
-                                        <input
-                                            type="text"
-                                            value={editingUser.name}
-                                            onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
-                                            className="w-full border p-2 rounded"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Status</label>
-                                        <select
-                                            value={editingUser.status}
-                                            onChange={(e) => setEditingUser({ ...editingUser, status: e.target.value })}
-                                            className="w-full border p-2 rounded"
-                                        >
-                                            <option value="ACTIVE">Active</option>
-                                            <option value="INACTIVE">Inactive</option>
-                                            <option value="BANNED">Banned</option>
-                                        </select>
-                                    </div>
-
-                                    {editingUser.role === 'LAWYER' && (
-                                        <>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Experience (Years)</label>
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    value={editingUser.experience_years || (editingUser.lawyerProfile?.experience_years || '')}
-                                                    onChange={(e) => setEditingUser({ ...editingUser, experience_years: e.target.value })}
-                                                    className="w-full border p-2 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Rating (0-5)</label>
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    max="5"
-                                                    step="0.1"
-                                                    value={editingUser.rating || (editingUser.lawyerProfile?.rating || '')}
-                                                    onChange={(e) => setEditingUser({ ...editingUser, rating: e.target.value })}
-                                                    className="w-full border p-2 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Rating Count</label>
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    value={editingUser.rating_count || (editingUser.lawyerProfile?.rating_count || '')}
-                                                    onChange={(e) => setEditingUser({ ...editingUser, rating_count: e.target.value })}
-                                                    className="w-full border p-2 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Consultation Fee</label>
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    value={editingUser.consultation_fee || (editingUser.lawyerProfile?.consultation_fee || '')}
-                                                    onChange={(e) => setEditingUser({ ...editingUser, consultation_fee: e.target.value })}
-                                                    className="w-full border p-2 rounded"
-                                                />
-                                            </div>
-                                        </>
-                                    )}
-                                    <div className="flex justify-end gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowEditModal(false)}
-                                            className="px-4 py-2 text-gray-600"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="px-4 py-2 bg-blue-600 text-white rounded"
-                                        >
-                                            Save Changes
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
->>>>>>> 3237ac6d19d8c032e1702be412a1e31b10a6d405
                     )}
                 </div>
             )}

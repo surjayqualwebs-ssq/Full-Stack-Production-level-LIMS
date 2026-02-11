@@ -1,0 +1,31 @@
+
+> frontend@0.0.0 build
+> vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 59 modules transformed.
+[31m✗[39m Build failed in 1.60s
+[31merror during build:
+[31m[vite:esbuild] Transform failed with 1 error:
+D:/Surjay Own/Qualwebs/QW Training/February/11th Feb 2026/Final Full Stack (Fastify+ReactJS) LIMS/frontend/src/pages/admin/Dashboard.jsx:333:0: ERROR: Unexpected "<<"[31m
+file: [36mD:/Surjay Own/Qualwebs/QW Training/February/11th Feb 2026/Final Full Stack (Fastify+ReactJS) LIMS/frontend/src/pages/admin/Dashboard.jsx:333:0[31m
+[33m
+[33mUnexpected "<<"[33m
+331 |                      {/* Edit Modal */}
+332 |                      {showEditModal && editingUser && (
+333 |  <<<<<<< HEAD
+    |  ^
+334 |                          <EditUserModal
+335 |                              user={editingUser}
+[31m
+    at failureErrorWithLog (D:\Surjay Own\Qualwebs\QW Training\February\11th Feb 2026\Final Full Stack (Fastify+ReactJS) LIMS\frontend\node_modules\esbuild\lib\main.js:1467:15)
+    at D:\Surjay Own\Qualwebs\QW Training\February\11th Feb 2026\Final Full Stack (Fastify+ReactJS) LIMS\frontend\node_modules\esbuild\lib\main.js:736:50
+    at responseCallbacks.<computed> (D:\Surjay Own\Qualwebs\QW Training\February\11th Feb 2026\Final Full Stack (Fastify+ReactJS) LIMS\frontend\node_modules\esbuild\lib\main.js:603:9)
+    at handleIncomingPacket (D:\Surjay Own\Qualwebs\QW Training\February\11th Feb 2026\Final Full Stack (Fastify+ReactJS) LIMS\frontend\node_modules\esbuild\lib\main.js:658:12)
+    at Socket.readFromStdout (D:\Surjay Own\Qualwebs\QW Training\February\11th Feb 2026\Final Full Stack (Fastify+ReactJS) LIMS\frontend\node_modules\esbuild\lib\main.js:581:7)
+    at Socket.emit (node:events:524:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:191:23)[39m
