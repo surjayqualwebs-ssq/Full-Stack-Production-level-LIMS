@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '../../context/ToastContext';
 import api from '../../api/axios';
 import { Users, FileText, Activity, Shield, LogOut, Plus, Search, Edit } from 'lucide-react';
 import EditUserModal from '../../components/admin/EditUserModal';
@@ -21,6 +22,7 @@ const AdminDashboard = () => {
     // Edit User State
     const [editingUser, setEditingUser] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const toast = useToast();
     const [formError, setFormError] = useState('');
     const [formSuccess, setFormSuccess] = useState('');
 
@@ -338,10 +340,13 @@ const AdminDashboard = () => {
                                     await api.put(`/admin/users/${updatedData.id}/profile`, updatedData);
                                     setShowEditModal(false);
                                     fetchData();
-                                    alert('User updated successfully');
+                                    await api.put(`/admin/users/${updatedData.id}/profile`, updatedData);
+                                    setShowEditModal(false);
+                                    fetchData();
+                                    toast.success('User updated successfully');
                                 } catch (error) {
                                     console.error(error);
-                                    alert('Failed to update user');
+                                    toast.error('Failed to update user');
                                     throw error; // Re-throw to handle loading state in modal if needed
                                 }
                             }}

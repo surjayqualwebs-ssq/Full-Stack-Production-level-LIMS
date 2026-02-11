@@ -1,29 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
+    const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
 
         try {
             const result = await login(email, password);
             if (!result.success) {
                 // Display specific message from backend (e.g., "Access Denied..")
-                setError(result.message || 'Login failed');
+                toast.error(result.message || 'Login failed');
             } else {
+                toast.success('Login successful! Redirecting...');
                 // AuthContext/AuthLayout will handle redirect based on role
             }
         } catch (err) {
-            setError('An unexpected error occurred');
+            toast.error('An unexpected error occurred');
         }
     };
 
@@ -35,12 +36,7 @@ const Login = () => {
             </div>
 
             <form className="space-y-6" onSubmit={handleSubmit}>
-                {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md flex items-center gap-2 text-sm">
-                        <AlertCircle size={16} />
-                        {error}
-                    </div>
-                )}
+
 
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>

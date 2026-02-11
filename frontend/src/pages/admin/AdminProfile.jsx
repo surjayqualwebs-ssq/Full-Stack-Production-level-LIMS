@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../../context/ToastContext';
 import api from '../../api/axios';
 import { User, Mail, Shield, Save } from 'lucide-react';
 
 const AdminProfile = () => {
     const navigate = useNavigate();
+    const toast = useToast();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
 
     // Form State
     const [name, setName] = useState('');
@@ -25,7 +26,7 @@ const AdminProfile = () => {
             setName(response.data.name || '');
         } catch (error) {
             console.error("Failed to fetch profile", error);
-            setMessage({ type: 'error', text: 'Failed to load profile data.' });
+            toast.error('Failed to load profile data.');
         } finally {
             setLoading(false);
         }
@@ -34,12 +35,11 @@ const AdminProfile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
-        setMessage({ type: '', text: '' });
 
         try {
             // Using the patch endpoint from incoming change
             await api.patch('/admin/me', { name });
-            setMessage({ type: 'success', text: 'Profile updated successfully!' });
+            toast.success('Profile updated successfully!');
             // Optional: Redirect after success if desired, but user asked for "View Profile" style which usually stays on page
             // The incoming code had a redirect, I will comment it out to match the "View Profile" request unless user wants it.
             // But let's keep the redirect if it was in the "incoming" code as valid logic?
@@ -47,7 +47,7 @@ const AdminProfile = () => {
             // So I will NOT redirect.
         } catch (error) {
             console.error("Failed to update profile", error);
-            setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update profile.' });
+            toast.error(error.response?.data?.message || 'Failed to update profile.');
         } finally {
             setSaving(false);
         }
@@ -109,11 +109,7 @@ const AdminProfile = () => {
                             </div>
                         </div>
 
-                        {message.text && (
-                            <div className={`p-4 rounded-lg text-sm ${message.type === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
-                                {message.text}
-                            </div>
-                        )}
+
 
                         <div className="flex justify-end">
                             <button

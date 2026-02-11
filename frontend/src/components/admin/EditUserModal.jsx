@@ -4,7 +4,6 @@ import { X, Save, User, Mail, Shield, Activity, Star, Briefcase, DollarSign } fr
 const EditUserModal = ({ user, onClose, onSave }) => {
     const [formData, setFormData] = useState({ ...user });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
 
     useEffect(() => {
         if (user) {
@@ -31,11 +30,11 @@ const EditUserModal = ({ user, onClose, onSave }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
         try {
             await onSave(formData);
         } catch (err) {
-            setError('Failed to save changes. Please try again.');
+            // Error is handled by parent toast
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -46,17 +45,17 @@ const EditUserModal = ({ user, onClose, onSave }) => {
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
             <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                
+
                 {/* Header */}
                 <div className="bg-gray-50 px-8 py-6 border-b border-gray-100 flex justify-between items-center">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                            <User className="text-blue-600" /> 
+                            <User className="text-blue-600" />
                             Edit User
                         </h2>
                         <p className="text-gray-500 text-sm mt-1">Update system access and profile details.</p>
                     </div>
-                    <button 
+                    <button
                         onClick={onClose}
                         className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500"
                     >
@@ -67,10 +66,10 @@ const EditUserModal = ({ user, onClose, onSave }) => {
                 {/* Body */}
                 <div className="p-8 max-h-[70vh] overflow-y-auto">
                     <form id="edit-user-form" onSubmit={handleSubmit} className="space-y-6">
-                        
+
                         {/* Core Info Section */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            
+
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-700">Full Name</label>
                                 <div className="relative">
@@ -130,10 +129,10 @@ const EditUserModal = ({ user, onClose, onSave }) => {
                                         <Shield size={18} className="text-gray-400" />
                                     </div>
                                     <input
-                                         type="text"
-                                         value={formData.role}
-                                         disabled
-                                         className="pl-10 w-full rounded-lg border-gray-300 border bg-gray-50 text-gray-500 py-2.5 cursor-not-allowed"
+                                        type="text"
+                                        value={formData.role}
+                                        disabled
+                                        className="pl-10 w-full rounded-lg border-gray-300 border bg-gray-50 text-gray-500 py-2.5 cursor-not-allowed"
                                     />
                                     {/* Role changing might be restricted or require specific logic */}
                                 </div>
@@ -146,7 +145,7 @@ const EditUserModal = ({ user, onClose, onSave }) => {
                             <>
                                 <div className="border-t border-gray-100 my-2"></div>
                                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Professional Details</h3>
-                                
+
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-gray-700">Experience (Yrs)</label>
@@ -204,11 +203,7 @@ const EditUserModal = ({ user, onClose, onSave }) => {
                             </>
                         )}
 
-                        {error && (
-                            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">
-                                {error}
-                            </div>
-                        )}
+
 
                     </form>
                 </div>
