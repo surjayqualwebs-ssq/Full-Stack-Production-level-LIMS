@@ -12,7 +12,7 @@ const AdminDashboard = () => {
 
     // New User Form State
     const [showUserForm, setShowUserForm] = useState(false);
-    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'STAFF', case_types: [], experience_years: '', rating: '', consultation_fee: '' });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'STAFF', case_types: [], experience_years: '', rating: '', rating_count: '', consultation_fee: '' });
 
     // Logs State
     const [logs, setLogs] = useState([]);
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
         try {
             await api.post('/admin/users', newUser);
             setFormSuccess('User created successfully!');
-            setNewUser({ name: '', email: '', password: '', role: 'STAFF', case_types: [], experience_years: '', rating: '', consultation_fee: '' });
+            setNewUser({ name: '', email: '', password: '', role: 'STAFF', case_types: [], experience_years: '', rating: '', rating_count: '', consultation_fee: '' });
             fetchData(); // Refresh list
             setTimeout(() => setShowUserForm(false), 2000);
         } catch (error) {
@@ -269,6 +269,17 @@ const AdminDashboard = () => {
                                             />
                                         </div>
                                         <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Rating Count (Reviews)</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={newUser.rating_count}
+                                                onChange={e => setNewUser({ ...newUser, rating_count: e.target.value })}
+                                                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                placeholder="e.g. 10"
+                                            />
+                                        </div>
+                                        <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Consultation Fee (₹)</label>
                                             <input
                                                 type="number"
@@ -376,6 +387,16 @@ const AdminDashboard = () => {
                                                     step="0.1"
                                                     value={editingUser.rating || (editingUser.lawyerProfile?.rating || '')}
                                                     onChange={(e) => setEditingUser({ ...editingUser, rating: e.target.value })}
+                                                    className="w-full border p-2 rounded"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">Rating Count</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    value={editingUser.rating_count || (editingUser.lawyerProfile?.rating_count || '')}
+                                                    onChange={(e) => setEditingUser({ ...editingUser, rating_count: e.target.value })}
                                                     className="w-full border p-2 rounded"
                                                 />
                                             </div>
