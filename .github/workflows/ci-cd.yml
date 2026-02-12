@@ -47,8 +47,12 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
           chmod 600 private_key.pem
           
-          # 2. Clean Disk Space (Fix "No space left on device")
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'docker system prune -af'
+          # 2. Clean Disk Space & Start Docker
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
+            sudo systemctl start docker
+            sudo systemctl enable docker
+            sudo docker system prune -af
+          '
 
           # 3. Transfer File (using cat over SSH to bypass SCP issues)
           # We use StrictHostKeyChecking=no to avoid manual verification
@@ -60,14 +64,14 @@ jobs:
             export EC2_HOST=${{ secrets.EC2_HOST }}
             
             # Force remove old containers
-            docker rm -f lims_frontend lims_backend lims_postgres || true
+            sudo docker rm -f lims_frontend lims_backend lims_postgres || true
             
             # Pull latest images
-            docker compose -f docker-compose-prod.yml pull
+            sudo docker compose -f docker-compose-prod.yml pull
             
             # Restart services
-            docker compose -f docker-compose-prod.yml up -d
+            sudo docker compose -f docker-compose-prod.yml up -d
           '
           
-          # 4. Cleanup
+          # 5. Cleanup
           rm -f private_key.pem
