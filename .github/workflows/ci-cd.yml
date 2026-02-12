@@ -47,11 +47,14 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
           chmod 600 private_key.pem
           
-          # 2. Transfer File (using cat over SSH to bypass SCP issues)
+          # 2. Clean Disk Space (Fix "No space left on device")
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'docker system prune -af'
+
+          # 3. Transfer File (using cat over SSH to bypass SCP issues)
           # We use StrictHostKeyChecking=no to avoid manual verification
           cat docker-compose-prod.yml | ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'cat > /home/${{ secrets.EC2_USER }}/docker-compose-prod.yml'
           
-          # 3. Deploy Commands
+          # 4. Deploy Commands
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             export EC2_HOST=${{ secrets.EC2_HOST }}
