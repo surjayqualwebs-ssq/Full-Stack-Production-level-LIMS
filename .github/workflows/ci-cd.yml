@@ -68,6 +68,7 @@ jobs:
             echo "EC2_HOST=${{ secrets.EC2_HOST }}" >> .env
             echo "NODE_ENV=production" >> .env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "DB_USER=${{ secrets.DB_USER }}" >> .env
           '
           
           # 5. Deploy Commands

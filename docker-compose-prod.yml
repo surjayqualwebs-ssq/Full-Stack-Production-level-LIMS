@@ -4,7 +4,7 @@ services:
     container_name: lims_postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: lims_db
     volumes:
@@ -21,7 +21,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: lims_db
-      DB_USER: postgres
+      DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       # DB_PASSWORD and JWT_SECRET are fetched from AWS Secrets Manager
       # JWT_SECRET: ...
