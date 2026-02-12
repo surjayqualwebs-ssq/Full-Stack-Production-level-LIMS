@@ -158,7 +158,11 @@ const AdminDashboard = () => {
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-bold text-gray-800">System Users</h2>
                         <button
-                            onClick={() => setShowUserForm(!showUserForm)}
+                            onClick={() => {
+                                setShowUserForm(!showUserForm);
+                                setFormSuccess('');
+                                setFormError('');
+                            }}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition"
                         >
                             <Plus size={18} /> {showUserForm ? 'Cancel' : 'Create New User'}
