@@ -76,6 +76,7 @@ export const getAllUsers = async () => {
 
     return users.map(user => {
         const u = user.toJSON();
+        let name = 'Unknown';
         let department = null;
         if (u.role === 'CLIENT' && u.clientProfile) name = u.clientProfile.name;
         else if (u.role === 'LAWYER' && u.lawyerProfile) name = u.lawyerProfile.name;
