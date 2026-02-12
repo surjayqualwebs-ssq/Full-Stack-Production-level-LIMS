@@ -27,12 +27,7 @@ services:
       # JWT_SECRET: ...
       CORS_ORIGIN: "http://${EC2_HOST}:80"
     command: npm start
-    logging:
-      driver: awslogs
-      options:
-        awslogs-region: ap-south-1
-        awslogs-group: /ec2/lims-backend
-        awslogs-create-group: "true"
+
     depends_on:
       - postgres
     volumes:
