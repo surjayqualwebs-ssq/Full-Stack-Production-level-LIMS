@@ -50,6 +50,8 @@ jobs:
           script: |
             whoami
             ls -la /home/${{ secrets.EC2_USER }}/
+            # Remove existing file to avoid permission errors (owned by root)
+            sudo rm -f /home/${{ secrets.EC2_USER }}/docker-compose-prod.yml
 
       - name: Copy docker-compose-prod.yml to EC2
         uses: appleboy/scp-action@v0.1.7
