@@ -41,28 +41,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy docker-compose-prod.yml to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          debug: true
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose-prod.yml"
-          target: "/tmp/"
-
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            # Move file from /tmp to home directory (handling permissions)
-            sudo mv /tmp/docker-compose-prod.yml /home/${{ secrets.EC2_USER }}/docker-compose-prod.yml
-            sudo chown ${{ secrets.EC2_USER }}:${{ secrets.EC2_USER }} /home/${{ secrets.EC2_USER }}/docker-compose-prod.yml
-
-            # Export env vars needed for compose
+        run: |
+          # 1. Setup SSH Key
+          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          
+          # 2. Transfer File (using cat over SSH to bypass SCP issues)
+          # We use StrictHostKeyChecking=no to avoid manual verification
+          cat docker-compose-prod.yml | ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'cat > /home/${{ secrets.EC2_USER }}/docker-compose-prod.yml'
+          
+          # 3. Deploy Commands
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             export EC2_HOST=${{ secrets.EC2_HOST }}
             
@@ -74,3 +64,7 @@ jobs:
             
             # Restart services
             docker compose -f docker-compose-prod.yml up -d
+          '
+          
+          # 4. Cleanup
+          rm -f private_key.pem
