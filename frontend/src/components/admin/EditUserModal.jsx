@@ -17,7 +17,8 @@ const EditUserModal = ({ user, onClose, onSave }) => {
                 // Let's assume standard structure:
                 experience_years: user.experience_years || user.lawyerProfile?.experience_years || '',
                 rating: user.rating || user.lawyerProfile?.rating || '',
-                consultation_fee: user.consultation_fee || user.lawyerProfile?.consultation_fee || ''
+                consultation_fee: user.consultation_fee || user.lawyerProfile?.consultation_fee || '',
+                department: user.department || user.staffProfile?.department || ''
             });
         }
     }, [user]);
@@ -140,6 +141,37 @@ const EditUserModal = ({ user, onClose, onSave }) => {
 
                         </div>
 
+
+
+                        {/* Staff Specifics */}
+                        {formData.role === 'STAFF' && (
+                            <>
+                                <div className="border-t border-gray-100 my-2"></div>
+                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Staff Details</h3>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">Department</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Briefcase size={18} className="text-gray-400" />
+                                        </div>
+                                        <select
+                                            name="department"
+                                            value={formData.department}
+                                            onChange={handleChange}
+                                            className="pl-10 w-full rounded-lg border-gray-300 border focus:ring-2 focus:ring-blue-100 focus:border-blue-500 py-2.5 transition-all appearance-none bg-white"
+                                        >
+                                            <option value="">Select Department</option>
+                                            <option value="LEGAL">Legal</option>
+                                            <option value="HR">HR</option>
+                                            <option value="IT">IT</option>
+                                            <option value="ADMIN">Admin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+
                         {/* Lawyer Specifics */}
                         {formData.role === 'LAWYER' && (
                             <>
@@ -238,8 +270,8 @@ const EditUserModal = ({ user, onClose, onSave }) => {
                     </button>
                 </div>
 
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

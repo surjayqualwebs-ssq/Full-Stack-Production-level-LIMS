@@ -14,7 +14,7 @@ const AdminDashboard = () => {
 
     // New User Form State
     const [showUserForm, setShowUserForm] = useState(false);
-    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'STAFF', case_types: [], experience_years: '', rating: '', rating_count: '', consultation_fee: '' });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'STAFF', department: '', case_types: [], experience_years: '', rating: '', rating_count: '', consultation_fee: '' });
 
     // Logs State
     const [logs, setLogs] = useState([]);
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
         try {
             await api.post('/admin/users', newUser);
             setFormSuccess('User created successfully!');
-            setNewUser({ name: '', email: '', password: '', role: 'STAFF', case_types: [], experience_years: '', rating: '', rating_count: '', consultation_fee: '' });
+            setNewUser({ name: '', email: '', password: '', role: 'STAFF', department: '', case_types: [], experience_years: '', rating: '', rating_count: '', consultation_fee: '' });
             fetchData(); // Refresh list
             setTimeout(() => setShowUserForm(false), 2000);
         } catch (error) {
@@ -219,6 +219,23 @@ const AdminDashboard = () => {
                                     </select>
                                 </div>
 
+                                {newUser.role === 'STAFF' && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                                        <select
+                                            value={newUser.department}
+                                            onChange={e => setNewUser({ ...newUser, department: e.target.value })}
+                                            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        >
+                                            <option value="">Select Department</option>
+                                            <option value="LEGAL">Legal</option>
+                                            <option value="HR">HR</option>
+                                            <option value="IT">IT</option>
+                                            <option value="ADMIN">Admin</option>
+                                        </select>
+                                    </div>
+                                )}
+
                                 {newUser.role === 'LAWYER' && (
                                     <>
                                         <div className="md:col-span-2">
@@ -304,6 +321,7 @@ const AdminDashboard = () => {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>

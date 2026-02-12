@@ -155,8 +155,8 @@ const StaffProfile = () => {
                                 <select
                                     id="department"
                                     value={department}
-                                    onChange={(e) => setDepartment(e.target.value)}
-                                    className="pl-10 w-full rounded-lg border-gray-300 border focus:ring-blue-500 focus:border-blue-500 py-2.5 transition-colors appearance-none bg-white"
+                                    disabled
+                                    className="pl-10 w-full rounded-lg border-gray-300 border bg-gray-50 text-gray-500 py-2.5 cursor-not-allowed appearance-none"
                                 >
                                     <option value="">Select Department</option>
                                     <option value="LEGAL">Legal</option>
@@ -165,6 +165,7 @@ const StaffProfile = () => {
                                     <option value="ADMIN">Admin</option>
                                 </select>
                             </div>
+                            <p className="text-xs text-gray-500 mt-1">Contact Admin to change department.</p>
                         </div>
 
                         {message.text && (

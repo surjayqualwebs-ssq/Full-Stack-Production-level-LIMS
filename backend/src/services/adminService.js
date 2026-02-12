@@ -69,20 +69,23 @@ export const getAllUsers = async () => {
         include: [
             { model: ClientProfile, as: 'clientProfile', attributes: ['name'] },
             { model: LawyerProfile, as: 'lawyerProfile', attributes: ['name'] },
-            { model: StaffProfile, as: 'staffProfile', attributes: ['name'] },
+            { model: StaffProfile, as: 'staffProfile', attributes: ['name', 'department'] },
             { model: AdminProfile, as: 'adminProfile', attributes: ['name'] }
         ]
     });
 
     return users.map(user => {
         const u = user.toJSON();
-        let name = 'Unknown';
+        let department = null;
         if (u.role === 'CLIENT' && u.clientProfile) name = u.clientProfile.name;
         else if (u.role === 'LAWYER' && u.lawyerProfile) name = u.lawyerProfile.name;
-        else if (u.role === 'STAFF' && u.staffProfile) name = u.staffProfile.name;
+        else if (u.role === 'STAFF' && u.staffProfile) {
+            name = u.staffProfile.name;
+            department = u.staffProfile.department;
+        }
         else if (u.role === 'ADMIN' && u.adminProfile) name = u.adminProfile.name;
 
-        return { ...u, name };
+        return { ...u, name, department };
     });
 };
 
