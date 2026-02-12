@@ -58,20 +58,25 @@ jobs:
           # We use StrictHostKeyChecking=no to avoid manual verification
           cat docker-compose-prod.yml | ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'cat > /home/${{ secrets.EC2_USER }}/docker-compose-prod.yml'
           
-          # 4. Deploy Commands
+          # 4. Create .env file for Docker Compose
+          # We need to write these to a file because sudo strips environment variables
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-            export EC2_HOST=${{ secrets.EC2_HOST }}
-            
+            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
+            echo "EC2_HOST=${{ secrets.EC2_HOST }}" >> .env
+            echo "NODE_ENV=production" >> .env
+          '
+          
+          # 5. Deploy Commands
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} '
             # Force remove old containers
             sudo docker rm -f lims_frontend lims_backend lims_postgres || true
             
-            # Pull latest images
+            # Pull latest images (docker compose reads .env automatically)
             sudo docker compose -f docker-compose-prod.yml pull
             
             # Restart services
             sudo docker compose -f docker-compose-prod.yml up -d
           '
           
-          # 5. Cleanup
+          # 6. Cleanup
           rm -f private_key.pem
