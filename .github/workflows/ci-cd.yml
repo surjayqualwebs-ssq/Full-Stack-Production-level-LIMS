@@ -79,6 +79,12 @@ jobs:
             
             # Restart services
             sudo docker compose -f docker-compose-prod.yml up -d
+
+            # Run Migrations
+            echo "Running database migrations..."
+            # Wait for container to be healthy/ready (simple sleep for now, ideally use wait-for-it)
+            sleep 10
+            sudo docker exec lims_backend npx sequelize-cli db:migrate
           '
           
           # 6. Cleanup
