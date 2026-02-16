@@ -17,7 +17,9 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         // Only connect if we have a token and user
+        console.log('SocketContext: Checking auth for connection...', { hasToken: !!token, userEmail: user?.email });
         if (token && user) {
+            console.log('SocketContext: Attempting connection...');
             // Connect to backend
             // Connect to backend (defaults to window.location.origin)
             const SOCKET_URL = import.meta.env.VITE_API_URL || undefined;
