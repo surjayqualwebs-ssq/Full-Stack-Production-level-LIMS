@@ -77,7 +77,15 @@ export const approveIntake = async (id, io) => {
     // Trigger Case Creation
     await caseService.generateCase(intake, io);
 
-    return intake;
+    // Reload with associations to return full object
+    return await db.Intake.findByPk(id, {
+        include: [{
+            model: db.User,
+            as: 'client',
+            attributes: ['id', 'email', 'role'],
+            include: [{ model: db.ClientProfile, as: 'clientProfile', attributes: ['name'] }]
+        }]
+    });
 };
 
 export const rejectIntake = async (id, reason) => {

@@ -71,9 +71,9 @@ export const reviewIntake = async (req, reply) => {
     });
 
     // Notify Client
-    // Ensure result has user_id/userId to target the correct room
-    if (result && (result.user_id || result.userId)) {
-        const clientUserId = result.user_id || result.userId;
+    // Ensure result has user_id/userId/client_id to target the correct room
+    if (result && (result.user_id || result.userId || result.client_id)) {
+        const clientUserId = result.user_id || result.userId || result.client_id;
         req.server.io.to(`client-${clientUserId}`).emit('intake:updated', result);
     }
     // Notify Admin/Staff dashboards
