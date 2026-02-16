@@ -12,16 +12,25 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
-    const { user, token } = useAuth();
+    const { user, token, logout } = useAuth();
     const { addToast } = useToast();
 
     useEffect(() => {
+        const authValue = { user, token, hasToken: !!token };
+        console.log('SocketContext: Auth State Debug:', authValue);
+
+        // Safety: If user exists but token doesn't, something is wrong with state sync. 
+        // Force logout to clear stale data.
+        if (user && !token) {
+            console.warn('SocketContext: User present but Token missing. Forcing logout to fix inconsistent state.');
+            logout();
+            return;
+        }
+
         // Only connect if we have a token and user
         console.log('SocketContext: Checking auth for connection...', { hasToken: !!token, userEmail: user?.email });
         if (token && user) {
             console.log('SocketContext: Attempting connection...');
-            // Connect to backend
-            // Connect to backend (defaults to window.location.origin)
             const SOCKET_URL = import.meta.env.VITE_API_URL || undefined;
             const newSocket = io(SOCKET_URL, {
                 auth: { token },

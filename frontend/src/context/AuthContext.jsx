@@ -13,12 +13,22 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem('user');
         const storedToken = localStorage.getItem('token');
 
+        console.log('AuthProvider: Initializing...', { storedUser: !!storedUser, storedToken: !!storedToken });
+
         if (storedUser && storedToken) {
             setUser(JSON.parse(storedUser));
             setToken(storedToken);
+            console.log('AuthProvider: Restored session');
+        } else {
+            console.log('AuthProvider: No session found');
         }
         setLoading(false);
     }, []);
+
+    // Monitor token state changes
+    useEffect(() => {
+        console.log('AuthProvider: Token state changed to:', !!token);
+    }, [token]);
 
     const login = async (email, password) => {
         try {
