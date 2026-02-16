@@ -42,7 +42,7 @@ export const reviewIntake = async (req, reply) => {
             result = await staffService.verifyIntake(id);
             break;
         case 'APPROVE':
-            result = await staffService.approveIntake(id);
+            result = await staffService.approveIntake(id, req.server.io);
             break;
         case 'REJECT':
             if (!reason) throw new ApiError(400, 'Rejection reason is required');
@@ -69,6 +69,15 @@ export const reviewIntake = async (req, reply) => {
         details: { reason, note, status },
         ipAddress: req.ip
     });
+
+    // Notify Client
+    // Ensure result has user_id/userId to target the correct room
+    if (result && (result.user_id || result.userId)) {
+        const clientUserId = result.user_id || result.userId;
+        req.server.io.to(`client-${clientUserId}`).emit('intake:updated', result);
+    }
+    // Notify Admin/Staff dashboards
+    req.server.io.to('admin-dashboard').to('staff-dashboard').emit('dashboard:intake-updated', result);
 
     return reply.send(result);
 };

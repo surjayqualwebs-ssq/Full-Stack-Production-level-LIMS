@@ -4,6 +4,7 @@ import { useToast } from '../../context/ToastContext';
 import api from '../../api/axios';
 import { Users, FileText, Activity, Shield, LogOut, Plus, Search, Edit } from 'lucide-react';
 import EditUserModal from '../../components/admin/EditUserModal';
+import { useSocket } from '../../context/SocketContext';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({ users: 0, cases: 0 });
@@ -20,11 +21,22 @@ const AdminDashboard = () => {
     const [logs, setLogs] = useState([]);
 
     // Edit User State
-    const [editingUser, setEditingUser] = useState(null);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const toast = useToast();
     const [formError, setFormError] = useState('');
     const [formSuccess, setFormSuccess] = useState('');
+
+    const socket = useSocket();
+
+    useEffect(() => {
+        if (socket) {
+            const handleUpdate = () => fetchData();
+            socket.on('dashboard:intake-added', handleUpdate);
+            socket.on('dashboard:intake-updated', handleUpdate);
+            return () => {
+                socket.off('dashboard:intake-added', handleUpdate);
+                socket.off('dashboard:intake-updated', handleUpdate);
+            };
+        }
+    }, [socket]);
 
     useEffect(() => {
         fetchData();

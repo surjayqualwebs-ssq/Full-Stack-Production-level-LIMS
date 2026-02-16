@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSocket } from '../../context/SocketContext';
 import api from '../../api/axios';
 import { PlusCircle, FileText, Briefcase, Clock, AlertTriangle, RefreshCw, XCircle } from 'lucide-react';
 
@@ -8,6 +9,19 @@ const ClientDashboard = () => {
     const [cases, setCases] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const socket = useSocket();
+
+    useEffect(() => {
+        if (socket) {
+            const handleUpdate = (data) => {
+                // Optional: Check if update relates to this client? 
+                // Socket room ensures it only receives relevant updates.
+                fetchData(true);
+            };
+            socket.on('intake:updated', handleUpdate);
+            return () => socket.off('intake:updated', handleUpdate);
+        }
+    }, [socket]);
 
     const fetchData = async (isRefresh = false) => {
         if (isRefresh) setRefreshing(true);

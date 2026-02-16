@@ -11,8 +11,7 @@ const buildApp = async (opts = {}) => {
     await app.register(helmet);
     await app.register(cors, {
         origin: [
-            process.env.CORS_ORIGIN,
-            "http://localhost:5173"
+            process.env.CORS_ORIGIN
         ].filter(Boolean),
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
@@ -32,6 +31,7 @@ const buildApp = async (opts = {}) => {
     });
     await app.register(import('./plugins/db.js'));
     await app.register(import('./plugins/auth.js'));
+    await app.register(import('./plugins/socket.js'));
 
     // Routes
     await app.register(import('./routes/healthRoutes.js'));

@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 
 const { Case, LawyerProfile, User } = db;
 
-export const generateCase = async (intake) => {
+export const generateCase = async (intake, io) => {
     const t = await db.sequelize.transaction();
 
     try {
@@ -70,6 +70,11 @@ export const generateCase = async (intake) => {
             const lawyerProfile = candidates[0].lawyerProfile;
             lawyerProfile.active_case_count += 1;
             await lawyerProfile.save({ transaction: t });
+
+            // Notify Lawyer
+            if (io) {
+                io.to(`lawyer-${selectedLawyerId}`).emit('case:assigned', newCase);
+            }
         }
 
         await t.commit();
@@ -80,7 +85,7 @@ export const generateCase = async (intake) => {
     }
 };
 
-export const processQueueForLawyer = async (lawyerId) => {
+export const processQueueForLawyer = async (lawyerId, io) => {
     const t = await db.sequelize.transaction();
     try {
         // 1. Get Lawyer Profile
@@ -130,6 +135,16 @@ export const processQueueForLawyer = async (lawyerId) => {
             // 6. Update Stats
             profile.active_case_count += 1;
             await profile.save({ transaction: t });
+
+            // Notify Lawyer
+            if (io) {
+                // queuedCase is a Case instance, but might be attached to previous transaction? 
+                // We are inside transaction t.
+                // Emission is side effect, can happen after commit? 
+                // Better inside but async? 
+                // socket.io emission is not transactional.
+                io.to(`lawyer-${lawyerId}`).emit('case:assigned', queuedCase);
+            }
         }
 
         await t.commit();
@@ -207,7 +222,7 @@ export const getUpcomingHearings = async (userId, role, days = 7) => {
     });
 };
 
-export const updateCaseStatus = async (caseId, newStatus, userId, userRole) => {
+export const updateCaseStatus = async (caseId, newStatus, userId, userRole, io) => {
     const caseRecord = await Case.findByPk(caseId);
     if (!caseRecord) throw new Error('Case not found');
 
@@ -235,5 +250,13 @@ export const updateCaseStatus = async (caseId, newStatus, userId, userRole) => {
     }
 
     caseRecord.status = newStatus;
-    return await caseRecord.save();
+    await caseRecord.save();
+
+    if (newStatus === 'CLOSED' && caseRecord.lawyer_id) {
+        // Trigger queue processing (fire and forget or await?)
+        // Await to ensure errors are caught or logged (processQueue handles its own errors)
+        await processQueueForLawyer(caseRecord.lawyer_id, io);
+    }
+
+    return caseRecord;
 };

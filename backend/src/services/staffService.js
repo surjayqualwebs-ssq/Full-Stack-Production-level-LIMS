@@ -67,7 +67,7 @@ export const verifyIntake = async (id, staffId) => {
     return await intake.save();
 };
 
-export const approveIntake = async (id) => {
+export const approveIntake = async (id, io) => {
     const intake = await db.Intake.findByPk(id);
     if (!intake) throw new Error('Intake not found');
 
@@ -75,7 +75,7 @@ export const approveIntake = async (id) => {
     await intake.save(); // Save first
 
     // Trigger Case Creation
-    await caseService.generateCase(intake);
+    await caseService.generateCase(intake, io);
 
     return intake;
 };

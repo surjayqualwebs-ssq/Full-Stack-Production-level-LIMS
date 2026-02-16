@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
+import { useSocket } from '../../context/SocketContext';
 import { Briefcase, Calendar, Clock, AlertCircle, CheckCircle, FileText, ChevronRight } from 'lucide-react';
 
 const LawyerDashboard = () => {
@@ -9,21 +10,33 @@ const LawyerDashboard = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchCases = async () => {
-            try {
-                const response = await api.get('/lawyer/cases');
-                setCases(response.data);
-            } catch (err) {
-                console.error("Failed to load assigned cases", err);
-                setError("Failed to load your assigned cases. Please try again.");
-            } finally {
-                setLoading(false);
-            }
-        };
+    const socket = useSocket();
 
+    const fetchCases = async () => {
+        try {
+            const response = await api.get('/lawyer/cases');
+            setCases(response.data);
+        } catch (err) {
+            console.error("Failed to load assigned cases", err);
+            setError("Failed to load your assigned cases. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchCases();
     }, []);
+
+    useEffect(() => {
+        if (socket) {
+            const handleAssignment = () => {
+                fetchCases();
+            };
+            socket.on('case:assigned', handleAssignment);
+            return () => socket.off('case:assigned', handleAssignment);
+        }
+    }, [socket]);
 
     if (loading) return <div className="p-8 text-center text-gray-500">Loading your cases...</div>;
 

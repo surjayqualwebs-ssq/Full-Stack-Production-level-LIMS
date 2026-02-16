@@ -26,6 +26,8 @@ services:
       # DB_PASSWORD and JWT_SECRET are fetched from AWS Secrets Manager
       # JWT_SECRET: ...
       CORS_ORIGIN: "http://${EC2_HOST}:80"
+    ports:
+      - "3168:3168"
     command: npm start
     logging:
       driver: awslogs
@@ -44,7 +46,9 @@ services:
     container_name: lims_frontend
     restart: always
     ports:
-      - "80:80"
+      - "80:5173"
+    environment:
+      - VITE_API_URL=http://${EC2_HOST}:3168
     depends_on:
       - backend
 

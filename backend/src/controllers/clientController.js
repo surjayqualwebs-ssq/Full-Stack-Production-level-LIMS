@@ -71,6 +71,8 @@ export const submitIntake = async (req, reply) => {
         ipAddress: req.ip
     });
 
+    req.server.io.to('admin-dashboard').to('staff-dashboard').emit('dashboard:intake-added', intake);
+
     return reply.code(201).send(intake);
 };
 
@@ -105,6 +107,8 @@ export const updateIntake = async (req, reply) => {
             entityId: intake.id,
             ipAddress: req.ip
         });
+
+        req.server.io.to('admin-dashboard').to('staff-dashboard').emit('dashboard:intake-updated', intake);
 
         return reply.send(intake);
     } catch (error) {

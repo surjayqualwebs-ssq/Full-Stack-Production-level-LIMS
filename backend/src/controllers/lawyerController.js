@@ -70,7 +70,7 @@ export const updateCaseStatus = async (req, reply) => {
     const { status } = req.body;
 
     // Explicit status transition logic
-    const updatedCase = await caseService.updateCaseStatus(id, status, userId, 'LAWYER');
+    const updatedCase = await caseService.updateCaseStatus(id, status, userId, 'LAWYER', req.server.io);
 
     await auditService.logAction({
         userId,
