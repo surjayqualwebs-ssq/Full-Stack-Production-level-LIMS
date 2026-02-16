@@ -5,15 +5,17 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [token, setToken] = useState(localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // Check for existing session
         const storedUser = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
+        const storedToken = localStorage.getItem('token');
 
-        if (storedUser && token) {
+        if (storedUser && storedToken) {
             setUser(JSON.parse(storedUser));
+            setToken(storedToken);
         }
         setLoading(false);
     }, []);
@@ -21,12 +23,13 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const response = await api.post('/auth/login', { email, password });
-            const { token, user } = response.data;
+            const { token, user } = response.data; // token is destructured here
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
 
             setUser(user);
+            setToken(token); // Update state
             return { success: true };
         } catch (error) {
             console.error('Login failed:', error);
@@ -36,10 +39,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (name, email, password) => {
         try {
-            const response = await api.post('/auth/register', { name, email, password });
-            // Depending on flow, we might auto-login or ask them to login.
-            // Assuming auto-login isn't implied by register API response unless we change backend.
-            // Backend returns User object, not token. So they need to login.
+            await api.post('/auth/register', { name, email, password });
             return { success: true };
         } catch (error) {
             return { success: false, message: error.response?.data?.message || 'Registration failed' };
@@ -50,10 +50,12 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
+        setToken(null); // Clear state
     };
 
     const value = {
         user,
+        token, // Expose token
         login,
         register,
         logout,
