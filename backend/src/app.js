@@ -10,9 +10,8 @@ const buildApp = async (opts = {}) => {
     // Core Plugins
     await app.register(helmet);
     await app.register(cors, {
-        origin: [
-            process.env.CORS_ORIGIN
-        ].filter(Boolean),
+        origin: true, // Allow dynamic origins (reflects request origin)
+
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
     });

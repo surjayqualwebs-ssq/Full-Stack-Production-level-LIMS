@@ -6,7 +6,7 @@ export default fp(async (fastify, opts) => {
   // 1. Initialize Socket.io
   const io = new Server(fastify.server, {
     cors: {
-      origin: process.env.CORS_ORIGIN, // Strict for production
+      origin: true, // Allow dynamic origins for Socket.io
       methods: ['GET', 'POST'],
       credentials: true
     }
