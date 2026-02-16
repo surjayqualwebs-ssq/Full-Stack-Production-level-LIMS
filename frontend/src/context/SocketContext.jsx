@@ -19,8 +19,8 @@ export const SocketProvider = ({ children }) => {
         // Only connect if we have a token and user
         if (token && user) {
             // Connect to backend
-            const SOCKET_URL = import.meta.env.VITE_API_URL;
-            if (!SOCKET_URL) console.error('Socket URL (VITE_API_URL) is not defined!');
+            // Connect to backend (defaults to window.location.origin)
+            const SOCKET_URL = import.meta.env.VITE_API_URL || undefined;
             const newSocket = io(SOCKET_URL, {
                 auth: { token },
                 withCredentials: true,
