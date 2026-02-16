@@ -23,6 +23,8 @@ const AdminDashboard = () => {
     // Edit User State
     const [formError, setFormError] = useState('');
     const [formSuccess, setFormSuccess] = useState('');
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingUser, setEditingUser] = useState(null);
 
     const socket = useSocket();
 
