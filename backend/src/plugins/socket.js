@@ -44,18 +44,20 @@ export default fp(async (fastify, opts) => {
     if (user) {
       fastify.log.info(`Socket User connected: ${user.id} (${user.role})`);
 
-      // Join Rooms based on Role
-      if (user.role === 'admin') {
+      // Join Rooms based on Role (Case Insensitive)
+      const role = user.role ? user.role.toUpperCase() : '';
+
+      if (role === 'ADMIN') {
         socket.join('admin-dashboard');
         fastify.log.info(`User ${user.id} joined admin-dashboard`);
-      } else if (user.role === 'staff') {
+      } else if (role === 'STAFF') {
         socket.join('staff-dashboard');
         fastify.log.info(`User ${user.id} joined staff-dashboard`);
-      } else if (user.role === 'lawyer') {
+      } else if (role === 'LAWYER') {
         socket.join('lawyer-dashboard');
         socket.join(`lawyer-${user.id}`);
         fastify.log.info(`User ${user.id} joined lawyer-dashboard & lawyer-${user.id}`);
-      } else if (user.role === 'client') {
+      } else if (role === 'CLIENT') {
         socket.join(`client-${user.id}`);
         fastify.log.info(`User ${user.id} joined client-${user.id}`);
       }
