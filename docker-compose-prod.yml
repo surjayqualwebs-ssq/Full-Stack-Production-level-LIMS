@@ -46,7 +46,7 @@ services:
     container_name: lims_frontend
     restart: always
     ports:
-      - "80:5173"
+      - "80:80"
     environment:
       - VITE_API_URL=http://${EC2_HOST}:3168
     depends_on:
