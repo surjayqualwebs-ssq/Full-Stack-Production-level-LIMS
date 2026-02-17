@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
+import { useSocket } from '../../context/SocketContext';
+import ConnectionBadge from '../../components/common/ConnectionBadge';
 import { ClipboardList, AlertCircle, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
 
 const StaffDashboard = () => {
@@ -8,6 +10,22 @@ const StaffDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
+    const socket = useSocket();
+
+    useEffect(() => {
+        if (socket) {
+            const handleUpdate = () => {
+                fetchPending(true);
+            };
+            socket.on('dashboard:intake-added', handleUpdate);
+            socket.on('dashboard:intake-updated', handleUpdate);
+
+            return () => {
+                socket.off('dashboard:intake-added', handleUpdate);
+                socket.off('dashboard:intake-updated', handleUpdate);
+            };
+        }
+    }, [socket]);
 
     const fetchPending = async (isRefresh = false) => {
         if (isRefresh) setRefreshing(true);
@@ -35,7 +53,10 @@ const StaffDashboard = () => {
         <div>
             <div className="mb-6 flex justify-between items-end">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Staff Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                        Staff Dashboard
+                        <ConnectionBadge />
+                    </h1>
                     <p className="text-gray-500">Review and process incoming client intakes.</p>
                 </div>
                 <button

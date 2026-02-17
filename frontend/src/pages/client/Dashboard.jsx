@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSocket } from '../../context/SocketContext';
+import ConnectionBadge from '../../components/common/ConnectionBadge';
 import api from '../../api/axios';
-import { PlusCircle, FileText, Briefcase, Clock, AlertTriangle, RefreshCw, XCircle } from 'lucide-react';
+import { PlusCircle, FileText, Briefcase, Clock, AlertTriangle, RefreshCw, XCircle, CheckCircle } from 'lucide-react';
 
 const ClientDashboard = () => {
     const [intakes, setIntakes] = useState([]);
@@ -56,7 +57,10 @@ const ClientDashboard = () => {
             {/* Header / Actions */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Welcome Back</h1>
+                    <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                        Welcome Back
+                        <ConnectionBadge />
+                    </h1>
                     <p className="text-gray-500">Track your legal matters and submissions.</p>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
@@ -178,13 +182,20 @@ const ClientDashboard = () => {
                                                 {new Date(intake.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${intake.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                                                    intake.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                                                        intake.status === 'CLARIFICATION_NEEDED' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-gray-100 text-gray-800'
-                                                    }`}>
-                                                    {intake.status}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${intake.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                                                        intake.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                                                            intake.status === 'CLARIFICATION_NEEDED' ? 'bg-yellow-100 text-yellow-800' :
+                                                                'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {intake.status}
+                                                    </span>
+                                                    {intake.documents_verified && intake.status === 'PENDING' && (
+                                                        <span className="text-blue-600 flex items-center gap-0.5 text-xs font-medium bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100" title="Documents Verified">
+                                                            <CheckCircle size={12} /> Verified
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 {intake.status === 'CLARIFICATION_NEEDED' ? (

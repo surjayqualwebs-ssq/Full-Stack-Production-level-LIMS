@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { useSocket } from '../../context/SocketContext';
+import ConnectionBadge from '../../components/common/ConnectionBadge';
 import { Briefcase, Calendar, Clock, AlertCircle, CheckCircle, FileText, ChevronRight } from 'lucide-react';
 
 const LawyerDashboard = () => {
@@ -44,7 +45,10 @@ const LawyerDashboard = () => {
         <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Lawyer Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                        Lawyer Dashboard
+                        <ConnectionBadge />
+                    </h1>
                     <p className="text-gray-500">Manage your assigned cases and reviews.</p>
                 </div>
                 <div className="bg-blue-50 px-4 py-2 rounded-lg text-blue-700 font-medium flex items-center gap-2">

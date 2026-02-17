@@ -5,6 +5,7 @@ import api from '../../api/axios';
 import { Users, FileText, Activity, Shield, LogOut, Plus, Search, Edit } from 'lucide-react';
 import EditUserModal from '../../components/admin/EditUserModal';
 import { useSocket } from '../../context/SocketContext';
+import ConnectionBadge from '../../components/common/ConnectionBadge';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({ users: 0, cases: 0 });
@@ -108,10 +109,7 @@ const AdminDashboard = () => {
                     <h1 className="text-2xl font-bold text-gray-800">Admin Overview</h1>
                     <div className="flex items-center gap-2 mt-1">
                         <p className="text-gray-500">System management and statistics</p>
-                        <span className={`flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${socket ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            <span className={`w-2 h-2 rounded-full ${socket ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                            {socket ? 'Connected' : 'Disconnected'}
-                        </span>
+                        <ConnectionBadge />
                     </div>
                 </div>
                 <div className="flex gap-4 flex-wrap">
