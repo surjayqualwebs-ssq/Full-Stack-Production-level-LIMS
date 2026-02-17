@@ -43,6 +43,13 @@ export const updateCaseDetails = async (req, reply) => {
 
     const updatedCase = await lawyerService.updateCase(userId, id, { status, next_hearing_date, notes });
 
+    // Emit real-time update
+    const io = req.server.io;
+    if (io && updatedCase.client_id) {
+        io.to(`client-${updatedCase.client_id}`).emit('case:updated', updatedCase);
+        io.to('admin-dashboard').emit('case:updated', updatedCase);
+    }
+
     await auditService.logAction({
         userId,
         action: 'UPDATE_CASE_DETAILS',
@@ -71,6 +78,13 @@ export const updateCaseStatus = async (req, reply) => {
 
     // Explicit status transition logic
     const updatedCase = await caseService.updateCaseStatus(id, status, userId, 'LAWYER', req.server.io);
+
+    // Emit real-time update (caseService might emit 'case:assigned' if auto-assign happens, but here we emit status update)
+    const io = req.server.io;
+    if (io && updatedCase.client_id) {
+        io.to(`client-${updatedCase.client_id}`).emit('case:updated', updatedCase);
+        io.to('admin-dashboard').emit('case:updated', updatedCase);
+    }
 
     await auditService.logAction({
         userId,

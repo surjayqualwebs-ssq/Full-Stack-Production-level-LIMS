@@ -37,9 +37,16 @@ const AdminDashboard = () => {
             };
             socket.on('dashboard:intake-added', handleUpdate);
             socket.on('dashboard:intake-updated', handleUpdate);
+            socket.on('case:updated', handleUpdate); // Listen for case updates
+            socket.on('user:registered', handleUpdate); // Listen for new users
+            socket.on('user:updated', handleUpdate); // Listen for user updates
+
             return () => {
                 socket.off('dashboard:intake-added', handleUpdate);
                 socket.off('dashboard:intake-updated', handleUpdate);
+                socket.off('case:updated', handleUpdate);
+                socket.off('user:registered', handleUpdate);
+                socket.off('user:updated', handleUpdate);
             };
         }
     }, [socket]);

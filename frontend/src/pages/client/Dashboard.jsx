@@ -20,7 +20,12 @@ const ClientDashboard = () => {
                 fetchData(true);
             };
             socket.on('intake:updated', handleUpdate);
-            return () => socket.off('intake:updated', handleUpdate);
+            socket.on('case:updated', handleUpdate); // Listen for case updates
+
+            return () => {
+                socket.off('intake:updated', handleUpdate);
+                socket.off('case:updated', handleUpdate);
+            }
         }
     }, [socket]);
 

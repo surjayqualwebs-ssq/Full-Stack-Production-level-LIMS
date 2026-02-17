@@ -52,6 +52,12 @@ export const createInternalUser = async (req, reply) => {
             ipAddress: req.ip
         });
 
+        // Emit real-time event
+        const io = req.server.io;
+        if (io) {
+            io.to('admin-dashboard').emit('user:registered', newUser);
+        }
+
         return reply.code(201).send({ message: 'User created successfully', userId: newUser.id });
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
@@ -103,6 +109,12 @@ export const updateUserProfile = async (req, reply) => {
         details: { updates: data },
         ipAddress: req.ip
     });
+
+    // Emit real-time event
+    const io = req.server.io;
+    if (io) {
+        io.to('admin-dashboard').emit('user:updated', { id, ...data });
+    }
 
     return reply.send({ message: 'User profile updated successfully' });
 };

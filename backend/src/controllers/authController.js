@@ -26,6 +26,12 @@ export const register = async (req, reply) => {
             ipAddress: req.ip
         });
 
+        // Emit real-time event to Admin Dashboard
+        const io = req.server.io;
+        if (io) {
+            io.to('admin-dashboard').emit('user:registered', user);
+        }
+
         return reply.code(201).send(user);
     } catch (error) {
         if (error.message === 'User already exists') {
