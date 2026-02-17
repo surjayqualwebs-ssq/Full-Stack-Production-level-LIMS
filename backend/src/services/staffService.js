@@ -20,7 +20,9 @@ export const updateProfile = async (userId, data) => {
 };
 
 export const getPendingIntakes = async (staffId) => {
-    const whereClause = { status: 'PENDING' };
+    const whereClause = {
+        status: { [db.Sequelize.Op.in]: ['PENDING', 'VERIFIED'] }
+    };
     if (staffId) {
         // Show intakes assigned to this staff OR unassigned intakes (pool)
         whereClause[db.Sequelize.Op.or] = [
@@ -62,7 +64,7 @@ export const verifyIntake = async (id, staffId) => {
 
     // Logic: Verification is a step before Approval
     intake.documents_verified = true;
-    // intake.status = 'PENDING'; // Ensure it stays pending if we want to be explicit, or just leave it.
+    intake.status = 'VERIFIED'; // Set status to VERIFIED as requested
 
     return await intake.save();
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
+import { useToast } from '../../context/ToastContext';
 
 const LawyerCaseDetails = () => {
     const { id } = useParams();
@@ -41,6 +42,8 @@ const LawyerCaseDetails = () => {
         }
     };
 
+    const { addToast } = useToast();
+
     const handleUpdate = async (e) => {
         e.preventDefault();
         setUpdating(true);
@@ -51,11 +54,12 @@ const LawyerCaseDetails = () => {
                 next_hearing_date: nextHearingDate || null,
                 notes
             });
-            alert('Case updated successfully!');
-            fetchCaseDetails(); // Refresh data
+            addToast('Case updated successfully!', 'success');
+            navigate('/lawyer/dashboard');
         } catch (err) {
             console.error(err);
             setError('Failed to update case');
+            addToast('Failed to update case', 'error');
         } finally {
             setUpdating(false);
         }

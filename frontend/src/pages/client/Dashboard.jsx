@@ -190,16 +190,12 @@ const ClientDashboard = () => {
                                                 <div className="flex items-center gap-2">
                                                     <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${intake.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
                                                         intake.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                                                            intake.status === 'CLARIFICATION_NEEDED' ? 'bg-yellow-100 text-yellow-800' :
-                                                                'bg-gray-100 text-gray-800'
+                                                            intake.status === 'VERIFIED' ? 'bg-blue-100 text-blue-800' :
+                                                                intake.status === 'CLARIFICATION_NEEDED' ? 'bg-yellow-100 text-yellow-800' :
+                                                                    'bg-gray-100 text-gray-800'
                                                         }`}>
                                                         {intake.status}
                                                     </span>
-                                                    {intake.documents_verified && intake.status === 'PENDING' && (
-                                                        <span className="text-blue-600 flex items-center gap-0.5 text-xs font-medium bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100" title="Documents Verified">
-                                                            <CheckCircle size={12} /> Verified
-                                                        </span>
-                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
